@@ -12,8 +12,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -65,6 +72,21 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    AutoBuilder.configureHolonomic(
+      this::getPose,
+      this::resetOdometry,
+      this::getRobotRelativeSpeeds,
+      this::driveRobotRelative,
+      new HolonomicPathFollowerConfig(
+        new PIDConstants(AutoConstants.kPXController,0,0),
+        new PIDConstants(AutoConstants.kPThetaController,0,0),
+        DriveConstants.kMaxSpeedMetersPerSecond, // max speed in m/s
+        Units.inchesToMeters(Math.sqrt(Math.pow(23.5, 2)+Math.pow(23.5,2))/2), // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
+        new ReplanningConfig()
+      ),
+      ()->true, // should flip path boolean supplier
+      this
+    );
   }
 
   @Override
@@ -184,6 +206,17 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
+  public void driveRobotRelative(ChassisSpeeds speeds){
+    this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
+  }
+  
+  public ChassisSpeeds getRobotRelativeSpeeds(){
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(m_frontLeft.getState(),
+                                                           m_frontRight.getState(),
+                                                           m_rearLeft.getState(),
+                                                           m_rearRight.getState());
   }
 
   /**
