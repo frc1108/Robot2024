@@ -13,6 +13,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.WPIUtilJNI;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -23,7 +25,9 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -69,6 +73,15 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
+
+  private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
+  new SysIdRoutine.Config(),
+  new SysIdRoutine.Mechanism(
+    (Measure<Voltage> volts) -> this.driveRobotVolts(volts.in(Voltage)),
+    null, // No log consumer, since data is recorded by URCL
+    this
+  )
+);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -211,6 +224,13 @@ public class DriveSubsystem extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds speeds){
     this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
   }
+
+  public void driveRobotVolts(double volts){
+    m_frontLeft.setModuleDrivingVolts(volts);
+    m_frontRight.setModuleDrivingVolts(-volts);
+    m_rearLeft.setModuleDrivingVolts(volts);
+    m_rearRight.setModuleDrivingVolts(-volts);
+  }
   
   public ChassisSpeeds getRobotRelativeSpeeds(){
     return DriveConstants.kDriveKinematics.toChassisSpeeds(m_frontLeft.getState(),
@@ -263,5 +283,13 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getHeading() {
     return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
+  }
+
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+      return sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+      return sysIdRoutine.dynamic(direction);
   }
 }

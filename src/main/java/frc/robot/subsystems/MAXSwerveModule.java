@@ -158,6 +158,16 @@ public class MAXSwerveModule {
     m_desiredState = desiredState;
   }
 
+  /**
+  * Sets the driving speed directly with voltage
+  * 
+  * @param voltage Volts to drive the driving motor with
+  *
+  */
+  public void setModuleDrivingVolts(double volts) {
+    m_drivingSparkMax.setVoltage(volts);
+  }
+
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
