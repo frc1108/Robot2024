@@ -16,6 +16,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -26,6 +28,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -95,9 +98,18 @@ public class DriveSubsystem extends SubsystemBase {
         new PIDConstants(AutoConstants.kPThetaController,0,0),
         DriveConstants.kMaxSpeedMetersPerSecond, // max speed in m/s
         Units.inchesToMeters(Math.sqrt(Math.pow(23.5, 2)+Math.pow(23.5,2))/2), // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
-        new ReplanningConfig()
-      ),
-      ()->true, // should flip path boolean supplier
+        new ReplanningConfig()),
+      () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field during auto only.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                  return alliance.get() == DriverStation.Alliance.Red & !DriverStation.isTeleop();
+              }
+              return false;
+      },
       this
     );
   }
@@ -287,6 +299,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
       return sysIdRoutine.quasistatic(direction);
+  }
+
+  public Command jacobsCmd(){
+    return Commands.waitUntil(()->true).andThen(Commands.none()).withName("Jacob's Command");
   }
 
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
