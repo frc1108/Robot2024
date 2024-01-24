@@ -80,7 +80,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
   new SysIdRoutine.Config(),
   new SysIdRoutine.Mechanism(
-    (volts) -> this.driveRobotVolts(volts.magnitude()),
+    (Measure<Voltage> volts) -> this.driveRobotVolts(volts.in(Voltage)),
     null, // No log consumer, since data is recorded by URCL
     this
   )
