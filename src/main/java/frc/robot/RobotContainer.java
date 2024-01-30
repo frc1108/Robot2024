@@ -13,13 +13,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -39,9 +40,11 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final LEDSubsystem m_led = new LEDSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(
+                                                 OIConstants.kDriverControllerPort);
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -77,10 +80,13 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    // new JoystickButton(m_driverController, Button.kR1.value)
+    //     .whileTrue(new RunCommand(
+    //         () -> m_robotDrive.setX(),
+    //         m_robotDrive));
+
+    m_driverController.b().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
+
   }
 
   /**
@@ -93,17 +99,17 @@ public class RobotContainer {
   }
 
   private void configureNamedCommands() {
-      NamedCommands.registerCommand("none", Commands.none());
-      NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
+      // NamedCommands.registerCommand("none", Commands.none());
+      // NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
     }
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
-    autoChooser.addOption("SpeedBump",leftStageAuto());
+    // autoChooser.addOption("SpeedBump",leftStageAuto());
   }
 
-  public Command leftStageAuto() {
-      return new PathPlannerAuto("LeftStage");
-    }
+  // public Command leftStageAuto() {
+  //     return new PathPlannerAuto("LeftStage");
+  //   }
 
 }
