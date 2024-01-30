@@ -7,6 +7,9 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -65,6 +70,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
+  SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       getHeading(),
       new SwerveModulePosition[] {
@@ -72,6 +78,8 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
+      },
+      new Pose2d());
       },
       new Pose2d());
 
@@ -89,6 +97,19 @@ public class DriveSubsystem extends SubsystemBase {
         Units.inchesToMeters(Math.sqrt(Math.pow(23.5, 2)+Math.pow(23.5,2))/2), // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
         new ReplanningConfig()
       ),
+      ()->{
+                    // Boolean supplier that controls when the path will be mirrored for the red
+                    // alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this
       ()->{
                     // Boolean supplier that controls when the path will be mirrored for the red
                     // alliance
@@ -124,6 +145,14 @@ public class DriveSubsystem extends SubsystemBase {
       m_rearRight.getState()
     });
     Logger.recordOutput("Chassis/Pose", getPose());        
+
+    Logger.recordOutput("Chassis/Actual", new SwerveModuleState[] {
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    });
+    Logger.recordOutput("Chassis/Pose", getPose());        
   }
 
   /**
@@ -132,6 +161,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
+    return m_poseEstimator.getEstimatedPosition();
     return m_poseEstimator.getEstimatedPosition();
   }
 
@@ -150,6 +180,11 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         },
         pose);
+  }
+
+  public void visionPose(Pose2d pose, double timestamp) {
+    m_poseEstimator.addVisionMeasurement(pose, timestamp);
+}
   }
 
   public void visionPose(Pose2d pose, double timestamp) {
