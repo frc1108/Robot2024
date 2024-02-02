@@ -12,10 +12,13 @@ import java.util.ListIterator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.LedConstants;
 import frc.utils.led.TrobotAddressableLED;
 import frc.utils.led.TrobotAddressableLEDPattern;
+import frc.utils.led.patterns.strip.BlueSoundMeter;
 import frc.utils.led.patterns.strip.RainbowPattern;
 import frc.utils.led.patterns.strip.SolidColorPattern;
 
@@ -28,16 +31,22 @@ public class LEDSubsystem extends SubsystemBase {
 	private TrobotAddressableLEDPattern m_purplePattern = new SolidColorPattern(Color.kPurple);
 	private TrobotAddressableLEDPattern m_yellowPattern = new SolidColorPattern(Color.kYellow);
 	private TrobotAddressableLEDPattern m_disabledPattern = new RainbowPattern();
+	private TrobotAddressableLEDPattern m_blueSoundMeter; 
   
   private TrobotAddressableLEDPattern m_currentPattern;
   private List<TrobotAddressableLEDPattern> m_patternList;
   private ListIterator<TrobotAddressableLEDPattern> m_patternIterator;
+  private CommandXboxController m_controller;
   /** Creates a new LEDSubsystem. */
-  public LEDSubsystem() {
+  public LEDSubsystem(CommandXboxController controller) {
+    m_controller = controller;
+    m_blueSoundMeter = new BlueSoundMeter(()->m_controller.getRightTriggerAxis(), Color.kBlue);
+
     m_patternList = new ArrayList<TrobotAddressableLEDPattern>
                         (Arrays.asList(m_redPattern,m_bluePattern,
                                        m_yellowPattern, m_purplePattern,
-                                       m_disabledPattern));
+                                       m_disabledPattern,m_blueSoundMeter));
+
 
     m_patternIterator = m_patternList.listIterator();
     
