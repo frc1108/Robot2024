@@ -40,13 +40,15 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final LEDSubsystem m_led = new LEDSubsystem();
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(
                                                  OIConstants.kDriverControllerPort);
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    private final LEDSubsystem m_led = new LEDSubsystem(m_driverController);
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
