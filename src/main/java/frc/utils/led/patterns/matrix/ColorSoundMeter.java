@@ -10,32 +10,28 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.utils.led.TrobotAddressableLEDPattern;
 
-public class EQSoundMeter implements TrobotAddressableLEDPattern{
-	private int m_firstHue = 0;
+public class ColorSoundMeter implements TrobotAddressableLEDPattern{
 	Color m_color;
-	DoubleSupplier m_blueSoundMeterDouble;
-	public EQSoundMeter(DoubleSupplier blueSoundMeterDouble, Color onColor){
+	DoubleSupplier m_soundMeterDouble;
+	public ColorSoundMeter(DoubleSupplier soundMeterDouble, Color onColor){
 		super();
 		m_color = onColor;
-		m_blueSoundMeterDouble = blueSoundMeterDouble;
+		m_soundMeterDouble = soundMeterDouble;
 	}
 
 	@Override
 	public void setLEDs(AddressableLEDBuffer buffer) {
 		int row_count = 8;
-		
-		var On = Math.round(m_blueSoundMeterDouble.getAsDouble()  * buffer.getLength() / row_count )* row_count;
-		
+		var On = Math.round(m_soundMeterDouble.getAsDouble()  * buffer.getLength() / row_count )* row_count;
+	
 		for (int index = 0; index < buffer.getLength(); index++){
 			if (index < On) {
-			  buffer.setLED(index, m_color);
+				buffer.setLED(index, m_color);
 			} else {
-			  buffer.setLED(index, Color.kBlack);
-			}
-		}
-
+				buffer.setLED(index, Color.kBlack);
+			}}
 	}
-
+	
 	public boolean isAnimated(){
 		return true;
 	}
