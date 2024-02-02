@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.utils.led.patterns.strip;
+package frc.utils.led.patterns.matrix;
 
 import java.util.function.DoubleSupplier;
 
@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.utils.led.TrobotAddressableLEDPattern;
 
-public class BlueSoundMeter implements TrobotAddressableLEDPattern{
+public class EQSoundMeter implements TrobotAddressableLEDPattern{
 	private int m_firstHue = 0;
 	Color m_color;
 	DoubleSupplier m_blueSoundMeterDouble;
-	public BlueSoundMeter(DoubleSupplier blueSoundMeterDouble, Color onColor){
+	public EQSoundMeter(DoubleSupplier blueSoundMeterDouble, Color onColor){
 		super();
 		m_color = onColor;
 		m_blueSoundMeterDouble = blueSoundMeterDouble;

@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.LedConstants;
 import frc.utils.led.TrobotAddressableLED;
 import frc.utils.led.TrobotAddressableLEDPattern;
-import frc.utils.led.patterns.strip.BlueSoundMeter;
+import frc.utils.led.patterns.matrix.BlueSoundMeter;
 import frc.utils.led.patterns.strip.RainbowPattern;
 import frc.utils.led.patterns.strip.SolidColorPattern;
 
