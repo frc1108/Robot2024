@@ -26,7 +26,7 @@ public class MultiColorMeter implements TrobotAddressableLEDPattern{
 
 		for (int index = 0; index < buffer.getLength(); index++){
 			if (index < On) {
-				currentHue = 300-(((index * 1080 / row_count) / buffer.getLength()) % 300);
+				currentHue = 300-(((index * 2160 / row_count) / buffer.getLength()) % 300);
 				buffer.setHSV(index, currentHue, 255, 128);
 			} else {
 				buffer.setLED(index, Color.kBlack);
