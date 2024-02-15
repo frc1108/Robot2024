@@ -106,11 +106,11 @@ m_operatorController.a().whileTrue(m_underroller.runUnderroller());
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
-    autoChooser.addOption("SpeedBump",leftStageAuto());
+    //autoChooser.addOption("SpeedBump",leftStageAuto());
   }
 
-  public Command leftStageAuto() {
-      return new PathPlannerAuto("LeftStage");
-    }
+  // public Command leftStageAuto() {
+  //     return new PathPlannerAuto("LeftStage");
+  //   }
 
 }
