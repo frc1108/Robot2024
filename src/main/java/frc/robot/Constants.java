@@ -140,7 +140,6 @@ public final class Constants {
 
   public static final class LedConstants {
     public static final int kLedPWMPort = 0;
-    public static final int kLedCount = 256;
 
   }
 }

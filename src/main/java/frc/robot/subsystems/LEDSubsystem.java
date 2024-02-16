@@ -9,8 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +24,7 @@ import frc.utils.led.TrobotAddressableLED;
 import frc.utils.led.TrobotAddressableLEDPattern;
 import frc.utils.led.patterns.matrix.ColorSoundMeter;
 import frc.utils.led.patterns.matrix.MultiColorMeter;
+import frc.utils.led.patterns.strip.ChaosPattern;
 import frc.utils.led.patterns.strip.RainbowPattern;
 import frc.utils.led.patterns.strip.SolidColorPattern;
 
@@ -34,21 +39,30 @@ public class LEDSubsystem extends SubsystemBase {
 	private TrobotAddressableLEDPattern m_disabledPattern = new RainbowPattern();
 	private TrobotAddressableLEDPattern m_rainbowMeter; 
 	private TrobotAddressableLEDPattern m_blueSoundMeter; 
-	private TrobotAddressableLEDPattern m_redSoundMeter; 
+	private TrobotAddressableLEDPattern m_redSoundMeter;
+	private TrobotAddressableLEDPattern m_chaos = new ChaosPattern();
+
   
   private TrobotAddressableLEDPattern m_currentPattern;
   private List<TrobotAddressableLEDPattern> m_patternList;
   private ListIterator<TrobotAddressableLEDPattern> m_patternIterator;
   private CommandXboxController m_controller;
+  private AnalogInput m_mic = new AnalogInput(0);
+  //private LinearFilter m_micFilter = new LinearFilter(null, null);
+  private MedianFilter m_micFilter = new MedianFilter(20);
+  
   /** Creates a new LEDSubsystem. */
   public LEDSubsystem(CommandXboxController controller) {
     m_controller = controller;
-    m_rainbowMeter = new MultiColorMeter(()->m_controller.getRightTriggerAxis());
-    m_blueSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kBlue);
-    m_redSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kRed);
+    m_rainbowMeter = new MultiColorMeter(()->this.getCrowdNoiseFiltered());
+    m_blueSoundMeter = new ColorSoundMeter(()->this.getCrowdNoiseFiltered(),Color.kBlue);
+    m_redSoundMeter = new ColorSoundMeter(()->this.getCrowdNoiseFiltered(),Color.kRed);
+    // m_rainbowMeter = new MultiColorMeter(()->m_controller.getRightTriggerAxis());
+    // m_blueSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kBlue);
+    // m_redSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kRed);
 
     m_patternList = new ArrayList<TrobotAddressableLEDPattern>
-                        (Arrays.asList(m_redPattern,m_bluePattern,
+                        (Arrays.asList(m_redPattern,m_bluePattern,m_chaos,
                                        m_yellowPattern, m_purplePattern,
                                        m_disabledPattern,m_rainbowMeter,m_blueSoundMeter,m_redSoundMeter));
 
@@ -56,6 +70,11 @@ public class LEDSubsystem extends SubsystemBase {
     m_patternIterator = m_patternList.listIterator();
     
     m_currentPattern =  m_redPattern;
+
+    m_mic.setGlobalSampleRate(50000);
+    //m_micFilter.movingAverage(1000);
+
+
   }
 
 
@@ -91,5 +110,14 @@ public class LEDSubsystem extends SubsystemBase {
   public void periodic() {
     m_led.setPattern(m_currentPattern);
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Crowd Noise",this.getCrowdNoise());
+    SmartDashboard.putNumber("Crowd Noise Filtered",this.getCrowdNoiseFiltered());
+  }
+
+  public double getCrowdNoise(){
+    return Math.pow((m_mic.getVoltage()-m_mic.getAverageVoltage()),2);
+  }
+  public double getCrowdNoiseFiltered(){
+    return m_micFilter.calculate(getCrowdNoise());
   }
 }
