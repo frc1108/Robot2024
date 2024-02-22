@@ -34,6 +34,6 @@ public void setUnderrollerspeed (double speed ){
 
 
   public Command runUnderroller(){
-    return Commands.startEnd(()->setUnderrollerspeed(0.5),()->setUnderrollerspeed(0));
+    return Commands.startEnd(()->setUnderrollerspeed(-0.5),()->setUnderrollerspeed(0));
   }
 }

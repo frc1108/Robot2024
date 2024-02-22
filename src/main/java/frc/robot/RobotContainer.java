@@ -85,7 +85,7 @@ private final Underroller m_underroller = new Underroller();
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-m_operatorController.a().whileTrue(m_underroller.runUnderroller());
+m_driverController.a().whileTrue(m_underroller.runUnderroller());
 
 
   }
@@ -106,11 +106,11 @@ m_operatorController.a().whileTrue(m_underroller.runUnderroller());
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
-    autoChooser.addOption("SpeedBump",leftStageAuto());
+    //autoChooser.addOption("SpeedBump",leftStageAuto());
   }
 
-  public Command leftStageAuto() {
-      return new PathPlannerAuto("LeftStage");
-    }
+  // public Command leftStageAuto() {
+  //     return new PathPlannerAuto("LeftStage");
+  //   }
 
 }
