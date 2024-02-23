@@ -18,6 +18,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
@@ -37,6 +38,7 @@ public class Arm extends TrapezoidProfileSubsystem {
     ArmConstants.kSVolts, ArmConstants.kGVolts, 
     ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
   private double m_goal = ArmConstants.kArmOffsetRads;
+  private boolean m_enabled;
   
   public Arm() {
     super(
@@ -49,18 +51,16 @@ public class Arm extends TrapezoidProfileSubsystem {
 
   m_leftMotor.restoreFactoryDefaults();
   m_rightMotor.restoreFactoryDefaults();
-  m_leftMotor.setInverted(false);
-  m_rightMotor.setInverted(true);
-
-  m_rightMotor.follow(m_leftMotor);
+  m_rightMotor.follow(m_leftMotor, true);
 
   m_encoder = m_leftMotor.getEncoder();
-  m_encoder.setPosition(ArmConstants.kArmOffsetRads);
   m_pid = m_leftMotor.getPIDController();
   m_pid.setFeedbackDevice(m_encoder);
 
   m_encoder.setPositionConversionFactor(ArmConstants.kArmEncoderPositionFactor);
   m_encoder.setVelocityConversionFactor(ArmConstants.kArmEncoderVelocityFactor);
+
+   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 
 m_pid.setP(ArmConstants.kP);
 m_pid.setI(ArmConstants.kI);
@@ -70,14 +70,28 @@ m_pid.setOutputRange(ArmConstants.kMinOutput,
         ArmConstants.kMaxOutput);
 
 // Apply current limit and idle mode
-m_leftMotor.setIdleMode(IdleMode.kBrake);
-m_rightMotor.setIdleMode(IdleMode.kBrake);
+m_leftMotor.setIdleMode(IdleMode.kCoast);
+m_rightMotor.setIdleMode(IdleMode.kCoast);
 m_leftMotor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
 m_rightMotor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
 
 // Save the SPARK MAX configurations.
 m_leftMotor.burnFlash();
 m_rightMotor.burnFlash();
+
+this.disable();
+m_enabled = false;
+  }
+
+  @Override
+  public void periodic(){
+    super.setGoal(m_goal);
+    super.periodic();
+
+    SmartDashboard.putNumber("Arm Goal", m_goal);
+    SmartDashboard.putNumber("Arm Position", getPositionRadians());
+    SmartDashboard.putNumber("Motor Output", getMotorCurrent());
+
   }
 
   @Override
@@ -119,4 +133,21 @@ public void setArmGoal(double goal) {
 public void setEncoderPosition(double position) {
   m_encoder.setPosition(position);
 }
+
+public double getMotorCurrent(){
+  return m_leftMotor.getOutputCurrent();
 }
+
+public Command toggleArmEnableCommand(){
+  return  runOnce(()->{
+    if(m_enabled) {
+      disable();
+      m_enabled = false;
+    } else {
+      enable();
+      m_enabled = true;
+    }
+  });
+}
+}
+  

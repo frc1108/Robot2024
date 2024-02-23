@@ -146,20 +146,21 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int kLeftArmMotorCanId = 31;
     public static final int kRightArmMotorCanId = 32;
+
     public static final double kSportGearRatio = 36.0;
     public static final double kSportPinionTeeth = 10;
     public static final double kArmSprocketTeeth = 52;
     public static final double kArmGearRatio = 187.2;
 
     // SysID values (in radians and radians/sec)
-    public static final double kSVolts = 0.11356;
-    public static final double kGVolts = 0.29175;
-    public static final double kVVoltSecondPerRad = 1.5928;
-    public static final double kAVoltSecondSquaredPerRad = 0.030171;
-    public static final double kMaxVelocityRadPerSecond = 5;
-    public static final double kMaxAccelerationRadPerSecSquared = 8;
+    public static final double kSVolts = 1.2; //0.11356;
+    public static final double kGVolts = 0.09; //0.29175;
+    public static final double kVVoltSecondPerRad = 3.65; //1.5928;
+    public static final double kAVoltSecondSquaredPerRad = 0;//0.030171;
+    public static final double kMaxVelocityRadPerSecond = 2;
+    public static final double kMaxAccelerationRadPerSecSquared = 2;
     public static final double kArmOffsetRads = Units.degreesToRadians(-45); //Starting angle
-    public static final double kArmMaxRads = Units.degreesToRadians(100); //Ending angle
+    public static final double kArmMaxRads = Units.degreesToRadians(90); //Ending angle
 
     public static final double kArmEncoderPositionFactor = ((2 * Math.PI) / kArmGearRatio); // radians
     public static final double kArmEncoderVelocityFactor = ((2 * Math.PI) / kArmGearRatio) / 60.0; // radians per second
@@ -168,17 +169,16 @@ public final class Constants {
     public static final double kArmEncoderPositionPIDMaxInput = kArmMaxRads; 
 
     public static final int kArmMotorCurrentLimit = 40; // amps
-    public static final double kP = 0.78697; //10000x
-    public static final double kPVel = 5.534E-11;
+    public static final double kP = 4; //10000x
     public static final double kI = 0;
-    public static final double kD = 0.00002194;
+    public static final double kD = 0;
     public static final double kDVel = 0;
     public static final double kFF = 0;
     public static final double kMinOutput = -1;
     public static final double kMaxOutput = 1;
-    public static final double kMaxPositionErrorRad = 0.7854;
-    public static final double kMaxVelocityErrorRadPerSec = 1.8656;
-    public static final double kControlEffortVolts = 7;
+    public static final double kMaxPositionErrorRad = 0.017; //0.7854;
+    public static final double kMaxVelocityErrorRadPerSec = 0.2; //1.8656;
+    public static final double kControlEffortVolts = 10;
 
     public static final double kMaxArmSpeedRpm = 
       NeoMotorConstants.kFreeSpeedRpm / kArmGearRatio ;
