@@ -73,11 +73,11 @@ private final Arm m_arm = new Arm();
                 true, true),
             m_robotDrive));
 
-                m_arm.setDefaultCommand(
-      new RunCommand(
-        () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
-          MathUtil.applyDeadband(m_operatorController.getRightY(),
-          ArmConstants.kArmDeadband)),m_arm));
+      //           m_arm.setDefaultCommand(
+      // new RunCommand(
+      //   () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
+      //     MathUtil.applyDeadband(m_operatorController.getRightY(),
+      //     ArmConstants.kArmDeadband)),m_arm));
   }
 
   /**
@@ -97,9 +97,11 @@ private final Arm m_arm = new Arm();
 
 m_driverController.a().whileTrue(m_underroller.runUnderroller());
 
-m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
+// m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
 
 m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15)));
+m_operatorController.x().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(-20)));
+
 
 
   }

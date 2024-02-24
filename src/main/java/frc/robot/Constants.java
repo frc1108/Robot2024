@@ -153,12 +153,12 @@ public final class Constants {
     public static final double kArmGearRatio = 187.2;
 
     // SysID values (in radians and radians/sec)
-    public static final double kSVolts = 1.2; //0.11356;
-    public static final double kGVolts = 0.09; //0.29175;
-    public static final double kVVoltSecondPerRad = 3.65; //1.5928;
-    public static final double kAVoltSecondSquaredPerRad = 0;//0.030171;
-    public static final double kMaxVelocityRadPerSecond = 2;
-    public static final double kMaxAccelerationRadPerSecSquared = 2;
+    public static final double kSVolts = 1.8; //0.11356;
+    public static final double kGVolts = 0.5; //0.29175;
+    public static final double kVVoltSecondPerRad = 7; //3.65; //1.5928;
+    public static final double kAVoltSecondSquaredPerRad = 0.02;//0.030171;
+    public static final double kMaxVelocityRadPerSecond = 0.5;
+    public static final double kMaxAccelerationRadPerSecSquared = 1;
     public static final double kArmOffsetRads = Units.degreesToRadians(-45); //Starting angle
     public static final double kArmMaxRads = Units.degreesToRadians(90); //Ending angle
 
@@ -171,21 +171,21 @@ public final class Constants {
     public static final int kArmMotorCurrentLimit = 40; // amps
     public static final double kP = 4; //10000x
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 0.5;
     public static final double kDVel = 0;
     public static final double kFF = 0;
     public static final double kMinOutput = -1;
     public static final double kMaxOutput = 1;
-    public static final double kMaxPositionErrorRad = 0.017; //0.7854;
-    public static final double kMaxVelocityErrorRadPerSec = 0.2; //1.8656;
-    public static final double kControlEffortVolts = 10;
+    public static final double kMaxPositionErrorRad = 0.7854;
+    public static final double kMaxVelocityErrorRadPerSec = 1.8656;
+    public static final double kControlEffortVolts = 7;
 
     public static final double kMaxArmSpeedRpm = 
       NeoMotorConstants.kFreeSpeedRpm / kArmGearRatio ;
     public static final double kMaxArmRadiansPerSecond =
       Units.rotationsPerMinuteToRadiansPerSecond(kMaxArmSpeedRpm);
 
-    public static final double kMaxArmSpeed = 0.5 / 1.25;
+    public static final double kMaxArmSpeed = 0.8;
     //public static final double kArmSlewRate = 2;
     public static final double kArmDeadband = 0.1;
 
