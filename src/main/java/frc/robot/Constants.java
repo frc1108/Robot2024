@@ -190,5 +190,8 @@ public final class Constants {
     public static final double kArmDeadband = 0.1;
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
+    public static final double kArmShootingAngleRads = Units.degreesToRadians(45);
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-30);
+    public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
   }
 }

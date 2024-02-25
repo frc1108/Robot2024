@@ -99,8 +99,8 @@ m_driverController.a().whileTrue(m_underroller.runUnderroller());
 
 // m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
 
-m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15)));
-m_operatorController.x().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(-20)));
+m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
+m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
 
 
 
