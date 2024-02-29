@@ -99,11 +99,11 @@ public class RobotContainer {
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
-    autoChooser.addOption("SpeedBump",leftStageAuto());
+    //autoChooser.addOption("SpeedBump",leftStageAuto());
   }
 
-  public Command leftStageAuto() {
-      return new PathPlannerAuto("LeftStage");
-    }
+  // public Command leftStageAuto() {
+  //     return new PathPlannerAuto("LeftStage");
+  //   }
 
 }
