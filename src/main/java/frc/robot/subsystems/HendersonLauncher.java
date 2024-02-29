@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -17,15 +18,19 @@ public class HendersonLauncher extends SubsystemBase {
   private final CANSparkFlex m_leftMotor = new CANSparkFlex(HendersonConstants.kLeftLauncherMotorCanId,MotorType.kBrushless);
   private final CANSparkFlex m_rightMotor = new CANSparkFlex(HendersonConstants.kRightLauncherMotorCanId,MotorType.kBrushless);
   private final RelativeEncoder m_encoder;
+  private final SparkPIDController m_pidController;
 
   /** Creates a new HendersonFeeder. */
   public HendersonLauncher() {
-        m_leftMotor.restoreFactoryDefaults();
+    m_leftMotor.restoreFactoryDefaults();
     m_rightMotor.restoreFactoryDefaults();
-    m_leftMotor.setIdleMode(IdleMode.kBrake);
-    m_rightMotor.setIdleMode(IdleMode.kBrake);
+    m_leftMotor.setIdleMode(IdleMode.kCoast);
+    m_rightMotor.setIdleMode(IdleMode.kCoast);
     m_rightMotor.follow(m_leftMotor, true);
     m_encoder = m_leftMotor.getEncoder();
+    m_pidController = m_leftMotor.getPIDController();
+
+    
 
 
     m_leftMotor.burnFlash();
