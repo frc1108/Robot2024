@@ -79,10 +79,4 @@ public class RobotContainer {
       NamedCommands.registerCommand("none", Commands.none());
       NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
     }
-
-
-  public Command leftStageAuto() {
-      return new PathPlannerAuto("LeftStage");
-    }
-
 }
