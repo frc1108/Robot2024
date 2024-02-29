@@ -13,12 +13,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Underroller;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,6 +45,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 private final Underroller m_underroller = new Underroller();
+private final Arm m_arm = new Arm();
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
@@ -68,6 +72,12 @@ private final Underroller m_underroller = new Underroller();
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
+
+      //           m_arm.setDefaultCommand(
+      // new RunCommand(
+      //   () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
+      //     MathUtil.applyDeadband(m_operatorController.getRightY(),
+      //     ArmConstants.kArmDeadband)),m_arm));
   }
 
   /**
@@ -86,6 +96,12 @@ private final Underroller m_underroller = new Underroller();
             m_robotDrive));
 
 m_driverController.a().whileTrue(m_underroller.runUnderroller());
+
+// m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
+
+m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15)));
+m_operatorController.x().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(-20)));
+
 
 
   }
@@ -106,11 +122,10 @@ m_driverController.a().whileTrue(m_underroller.runUnderroller());
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
-    //autoChooser.addOption("SpeedBump",leftStageAuto());
-  }
+    //autoChooser.addOption("SpeedBump",leftStageAuto());  }
 
   // public Command leftStageAuto() {
   //     return new PathPlannerAuto("LeftStage");
   //   }
 
-}
+}}

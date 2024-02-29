@@ -17,7 +17,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
@@ -30,7 +30,6 @@ public class Arm extends TrapezoidProfileSubsystem {
 
   private final SparkPIDController m_pid;
   private final RelativeEncoder m_encoder;
-  //private final ADIS16470_IMU m_imu;
 
   private final ArmFeedforward m_feedforward = 
   new ArmFeedforward(
@@ -49,35 +48,48 @@ public class Arm extends TrapezoidProfileSubsystem {
 
   m_leftMotor.restoreFactoryDefaults();
   m_rightMotor.restoreFactoryDefaults();
-  m_leftMotor.setInverted(false);
-  m_rightMotor.setInverted(true);
-
-  m_rightMotor.follow(m_leftMotor);
+  m_rightMotor.follow(m_leftMotor, true);
 
   m_encoder = m_leftMotor.getEncoder();
-  m_encoder.setPosition(ArmConstants.kArmOffsetRads);
   m_pid = m_leftMotor.getPIDController();
   m_pid.setFeedbackDevice(m_encoder);
 
   m_encoder.setPositionConversionFactor(ArmConstants.kArmEncoderPositionFactor);
   m_encoder.setVelocityConversionFactor(ArmConstants.kArmEncoderVelocityFactor);
+  m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 
-m_pid.setP(ArmConstants.kP);
-m_pid.setI(ArmConstants.kI);
-m_pid.setD(ArmConstants.kD);
-m_pid.setFF(ArmConstants.kFF);
-m_pid.setOutputRange(ArmConstants.kMinOutput,
+  m_pid.setP(ArmConstants.kP);
+  m_pid.setI(ArmConstants.kI);
+  m_pid.setD(ArmConstants.kD);
+  m_pid.setFF(ArmConstants.kFF);
+  m_pid.setOutputRange(ArmConstants.kMinOutput,
         ArmConstants.kMaxOutput);
 
-// Apply current limit and idle mode
-m_leftMotor.setIdleMode(IdleMode.kBrake);
-m_rightMotor.setIdleMode(IdleMode.kBrake);
-m_leftMotor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
-m_rightMotor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
+  // Apply current limit and idle mode
+  m_leftMotor.setIdleMode(IdleMode.kBrake);
+  m_rightMotor.setIdleMode(IdleMode.kBrake);
+  m_leftMotor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
+  m_rightMotor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
 
-// Save the SPARK MAX configurations.
-m_leftMotor.burnFlash();
-m_rightMotor.burnFlash();
+  // Save the SPARK MAX configurations.
+  m_leftMotor.burnFlash();
+  m_rightMotor.burnFlash();
+  }
+
+  @Override
+  public void periodic(){
+    super.setGoal(m_goal);
+    super.periodic();
+
+    SmartDashboard.putNumber("Arm Goal", m_goal);
+    SmartDashboard.putNumber("Arm Position", getPositionRadians());
+    SmartDashboard.putNumber("Motor Output", getMotorCurrent());
+    SmartDashboard.putBoolean("Left Follower", m_leftMotor.isFollower());
+    SmartDashboard.putBoolean("Right Follower", m_rightMotor.isFollower());
+    SmartDashboard.putNumber("Left Output", m_leftMotor.get());
+    SmartDashboard.putNumber("Right Output", m_rightMotor.get());
+    SmartDashboard.putNumber("Position Conv", m_encoder.getPositionConversionFactor());
+    SmartDashboard.putNumber("Vel Conv", m_encoder.getVelocityConversionFactor());
   }
 
   @Override
@@ -85,6 +97,11 @@ m_rightMotor.burnFlash();
   // Calculate the feedforward from the sepoint
   double feedforward = m_feedforward.calculate(setpoint.position,
                                                setpoint.velocity);
+
+  SmartDashboard.putNumber("Feedforward", feedforward);
+  SmartDashboard.putNumber("Setpoint Position", setpoint.position);
+  SmartDashboard.putNumber("Setpoint Velocity", setpoint.velocity);
+
   
   // Add the feedforward to the PID output to get the motor output
   m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
@@ -119,4 +136,21 @@ public void setArmGoal(double goal) {
 public void setEncoderPosition(double position) {
   m_encoder.setPosition(position);
 }
+
+public double getMotorCurrent(){
+  return m_leftMotor.getOutputCurrent();
 }
+
+// public Command toggleArmEnableCommand(){
+//   return  runOnce(()->{
+//     if(m_enabled) {
+//       disable();
+//       m_enabled = false;
+//     } else {
+//       enable();
+//       m_enabled = true;
+//     }
+//   });
+// }
+}
+  
