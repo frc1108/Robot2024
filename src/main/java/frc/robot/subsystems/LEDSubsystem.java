@@ -47,7 +47,7 @@ public class LEDSubsystem extends SubsystemBase {
   private List<TrobotAddressableLEDPattern> m_patternList;
   private ListIterator<TrobotAddressableLEDPattern> m_patternIterator;
   private CommandXboxController m_controller;
-  private AnalogInput m_mic = new AnalogInput(0);
+  private AnalogInput m_mic = new AnalogInput(LedConstants.kVolumeSensorPort);
   //private LinearFilter m_micFilter = new LinearFilter(null, null);
   private MedianFilter m_micFilter = new MedianFilter(20);
   
