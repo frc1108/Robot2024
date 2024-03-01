@@ -95,7 +95,9 @@ private final Arm m_arm = new Arm();
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-m_operatorController.a().whileTrue(m_underroller.runUnderroller());
+m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
+m_operatorController.rightBumper().whileTrue(m_underroller.reverseUnderroller().withName("Outtaking"));
+
 
 // m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
 
