@@ -11,6 +11,8 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HendersonConstants;
 
@@ -40,5 +42,21 @@ public class HendersonLauncher extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void set(double speed) {
+    m_leftMotor.set(speed);
+  }
+
+  public Command run() {
+    return Commands.runOnce(()->set(0.5));
+  }
+
+  public Command runReverse() {
+    return Commands.runOnce(()->set(-0.35));
+  }
+
+  public Command stop() {
+    return Commands.runOnce(()->set(0));
   }
 }

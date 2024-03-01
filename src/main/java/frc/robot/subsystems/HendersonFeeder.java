@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANDigitalInput.LimitSwitchPolarity;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkLimitSwitch.Type;
@@ -36,7 +35,7 @@ public class HendersonFeeder extends SubsystemBase {
     m_rightMotor.burnFlash();
 
   }
-  public void setSpeed(double speed){
+  public void set(double speed){
     m_leftMotor.set(speed);
   }
 
@@ -44,15 +43,21 @@ public class HendersonFeeder extends SubsystemBase {
     return m_leftMotor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
   }
 
-  public Command runCommand(){
-    return run(()->setSpeed(0.5));
+  public Command run(){
+    return Commands.runOnce(()->set(0.5));
+  }
+  public Command runReverse(){
+    return Commands.runOnce(()->set(-0.35));
+  }
+  public Command stop() {
+    return Commands.runOnce(()->set(0));
   }
 
   public Command runStopCommand(){
-    return Commands.sequence(runOnce(()->setSpeed(0.5)),
+    return Commands.sequence(runOnce(()->set(0.5)),
              Commands.race(Commands.waitSeconds(2),
                            Commands.waitUntil(this::getBeamBreak)),
-             runOnce(()->setSpeed(0)).withName("Beam Feeder"));
+             runOnce(()->set(0)).withName("Beam Feeder"));
   }
 
   @Override
