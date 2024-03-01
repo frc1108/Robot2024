@@ -8,13 +8,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftStage"
+            "pathName": null
           }
         },
         {
           "type": "named",
           "data": {
             "name": "none"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": []
           }
         }
       ]
