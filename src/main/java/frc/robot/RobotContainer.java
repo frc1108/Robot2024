@@ -95,7 +95,7 @@ private final Arm m_arm = new Arm();
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-m_driverController.a().whileTrue(m_underroller.runUnderroller());
+m_operatorController.a().whileTrue(m_underroller.runUnderroller());
 
 // m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
 
