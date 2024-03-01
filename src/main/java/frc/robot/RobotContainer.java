@@ -105,8 +105,10 @@ public class RobotContainer {
 
     m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
-    m_operatorController.x().whileTrue(Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
-    m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+
+    m_operatorController.x().whileTrue(m_launcher.run());//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
+    //m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+    m_operatorController.b().whileTrue(m_feeder.run());//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
   }
 
   /**

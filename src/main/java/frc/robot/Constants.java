@@ -157,8 +157,8 @@ public final class Constants {
     public static final double kGVolts = 0.5; //0.29175;
     public static final double kVVoltSecondPerRad = 7; //3.65; //1.5928;
     public static final double kAVoltSecondSquaredPerRad = 0.02;//0.030171;
-    public static final double kMaxVelocityRadPerSecond = 0.5;
-    public static final double kMaxAccelerationRadPerSecSquared = 1;
+    public static final double kMaxVelocityRadPerSecond = 1.5;
+    public static final double kMaxAccelerationRadPerSecSquared = 2;
     public static final double kArmOffsetRads = Units.degreesToRadians(-45); //Starting angle
     public static final double kArmMaxRads = Units.degreesToRadians(90); //Ending angle
 
