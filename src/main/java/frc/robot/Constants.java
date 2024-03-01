@@ -117,6 +117,7 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
+    public static int kOperatorControllerPort = 1;
   }
 
   public static final class AutoConstants {
@@ -136,5 +137,15 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  }
+    
+  public static final class HendersonConstants {
+    public static final int kLeftLauncherMotorCanId = 41;
+    public static final int kRightLauncherMotorCanId = 42;
+    public static final int kLeftFeederMotorCanId = 43;
+    public static final int kRightFeederMotorCanId = 44;
+    public static final double kFeederGearRatio = 47/11;
+    
+
   }
 }
