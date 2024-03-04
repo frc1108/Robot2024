@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
@@ -127,13 +128,18 @@ public class RobotContainer {
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
+    autoChooser.addOption("Test Auto", TestAuto());
   }
    
-  // public Command leftStageAuto() {
-  //     return new PathPlannerAuto("LeftStage");
-  // }
+  public Command TestAuto() {
+      return new PathPlannerAuto("Test Auto");
+  }
 
   public Command intakeNote() {
     return Commands.sequence(Commands.parallel(m_launcher.runReverse(),m_feeder.runReverse()));
+  }
+
+  public void periodic() {
+    SmartDashboard.putData(autoChooser);
   }
 }
