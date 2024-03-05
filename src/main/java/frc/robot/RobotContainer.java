@@ -47,7 +47,7 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-    private final LEDSubsystem m_led = new LEDSubsystem(m_driverController);
+    private final LEDSubsystem m_led = new LEDSubsystem();
 
 
   /**

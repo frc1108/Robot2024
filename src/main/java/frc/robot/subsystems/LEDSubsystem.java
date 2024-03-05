@@ -9,16 +9,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.LedConstants;
 import frc.utils.led.TrobotAddressableLED;
 import frc.utils.led.TrobotAddressableLEDPattern;
@@ -46,17 +47,16 @@ public class LEDSubsystem extends SubsystemBase {
   private TrobotAddressableLEDPattern m_currentPattern;
   private List<TrobotAddressableLEDPattern> m_patternList;
   private ListIterator<TrobotAddressableLEDPattern> m_patternIterator;
-  private CommandXboxController m_controller;
   private AnalogInput m_mic = new AnalogInput(LedConstants.kVolumeSensorPort);
-  //private LinearFilter m_micFilter = new LinearFilter(null, null);
-  private MedianFilter m_micFilter = new MedianFilter(20);
+  private final AnalogInputSim m_micSim;
+  private LinearFilter m_micFilter = LinearFilter.movingAverage(20);
+  //private MedianFilter m_micFilter = new MedianFilter(20);
   
   /** Creates a new LEDSubsystem. */
-  public LEDSubsystem(CommandXboxController controller) {
-    m_controller = controller;
-    m_rainbowMeter = new MultiColorMeter(()->this.getCrowdNoiseFiltered());
-    m_blueSoundMeter = new ColorSoundMeter(()->this.getCrowdNoiseFiltered(),Color.kBlue);
-    m_redSoundMeter = new ColorSoundMeter(()->this.getCrowdNoiseFiltered(),Color.kRed);
+  public LEDSubsystem() {
+    m_rainbowMeter = new MultiColorMeter(()->this.getMicOutput());
+    m_blueSoundMeter = new ColorSoundMeter(()->this.getMicOutput(),Color.kBlue);
+    m_redSoundMeter = new ColorSoundMeter(()->this.getMicOutput(),Color.kRed);
     // m_rainbowMeter = new MultiColorMeter(()->m_controller.getRightTriggerAxis());
     // m_blueSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kBlue);
     // m_redSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kRed);
@@ -71,8 +71,8 @@ public class LEDSubsystem extends SubsystemBase {
     
     m_currentPattern =  m_redPattern;
 
-    m_mic.setGlobalSampleRate(50000);
-    //m_micFilter.movingAverage(1000);
+    AnalogInput.setGlobalSampleRate(50000);
+    m_micSim = new AnalogInputSim(m_mic);
 
 
   }
@@ -110,14 +110,35 @@ public class LEDSubsystem extends SubsystemBase {
   public void periodic() {
     m_led.setPattern(m_currentPattern);
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Crowd Noise",this.getCrowdNoise());
-    SmartDashboard.putNumber("Crowd Noise Filtered",this.getCrowdNoiseFiltered());
+    SmartDashboard.putNumber("Mic Voltage",this.getMicVoltage());
+    SmartDashboard.putNumber("Mic Avg Voltage",this.getMicAverageVoltage());
+    SmartDashboard.putNumber("Mic Filtered",this.getMicFiltered());
+    SmartDashboard.putNumber("Mic Output",this.getMicOutput());
   }
 
-  public double getCrowdNoise(){
-    return Math.pow((m_mic.getVoltage()-m_mic.getAverageVoltage()),2);
+   public double getMicVoltage() {
+    if (RobotBase.isReal()) {
+      return Math.pow(m_mic.getVoltage()-m_mic.getAverageVoltage(),2);
+    } else {
+      return Math.pow(m_micSim.getVoltage()-2.5,2);
+    }
   }
-  public double getCrowdNoiseFiltered(){
-    return m_micFilter.calculate(getCrowdNoise());
+
+  public double getMicAverageVoltage() {
+    return m_mic.getAverageVoltage();
   }
+
+  public double getMicFiltered() {
+    try {
+      return m_micFilter.calculate(getMicVoltage());
+    } catch (NullPointerException e) {
+      System.out.println(e);
+      return 0;
+    }
+  }
+
+  public double getMicOutput() {
+    return getMicFiltered();
+    //return MathUtil.clamp(getMicFiltered(),0,1);
+  } 
 }
