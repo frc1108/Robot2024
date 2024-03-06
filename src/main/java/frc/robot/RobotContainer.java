@@ -13,17 +13,25 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Underroller;
+import frc.robot.subsystems.HendersonFeeder;
+import frc.robot.subsystems.HendersonLauncher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
@@ -39,9 +47,14 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final Underroller m_underroller = new Underroller();
+  private final Arm m_arm = new Arm();
+  private final HendersonFeeder m_feeder = new HendersonFeeder();
+  private final HendersonLauncher m_launcher  = new HendersonLauncher();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -65,6 +78,12 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
+
+      //           m_arm.setDefaultCommand(
+      // new RunCommand(
+      //   () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
+      //     MathUtil.applyDeadband(m_operatorController.getRightY(),
+      //     ArmConstants.kArmDeadband)),m_arm));
   }
 
   /**
@@ -77,10 +96,20 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
+
+    m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
+    m_operatorController.rightBumper().whileTrue(m_underroller.reverseUnderroller().withName("Outtaking"));
+
+
+// m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
+
+    m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
+    m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
+
+    m_operatorController.x().whileTrue(m_launcher.run());//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
+    //m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+    m_operatorController.b().whileTrue(m_feeder.run());//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
   }
 
   /**
@@ -99,11 +128,11 @@ public class RobotContainer {
 
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
-    //autoChooser.addOption("SpeedBump",leftStageAuto());
+    autoChooser.addOption("Test Auto", TestAuto());
   }
 
-  // public Command leftStageAuto() {
-  //     return new PathPlannerAuto("LeftStage");
-  //   }
+  public Command leftStageAuto() {
+      return new PathPlannerAuto("LeftStage");
+    }
 
 }

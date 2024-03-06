@@ -8,13 +8,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftStage"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "none"
+            "pathName": "Two Meter Straight"
           }
         }
       ]
