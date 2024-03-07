@@ -12,13 +12,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -124,6 +122,14 @@ public class DriveSubsystem extends SubsystemBase {
       m_rearRight.getState()
     });
     Logger.recordOutput("Chassis/Pose", getPose());        
+
+    Logger.recordOutput("Chassis/Actual", new SwerveModuleState[] {
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    });
+    Logger.recordOutput("Chassis/Pose", getPose());        
   }
 
   /**
@@ -155,6 +161,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void visionPose(Pose2d pose, double timestamp) {
     m_poseEstimator.addVisionMeasurement(pose, timestamp);
 }
+
 
   /**
    * Method to drive the robot using joystick info.
