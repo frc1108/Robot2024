@@ -82,6 +82,7 @@ public class Arm extends TrapezoidProfileSubsystem {
     super.periodic();
 
     SmartDashboard.putNumber("Arm Goal", m_goal);
+    SmartDashboard.getNumber("Arm Goal", MathUtil.clamp(m_goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1));
     SmartDashboard.putNumber("Arm Position", getPositionRadians());
     SmartDashboard.putNumber("Motor Output", getMotorCurrent());
     SmartDashboard.putBoolean("Left Follower", m_leftMotor.isFollower());
