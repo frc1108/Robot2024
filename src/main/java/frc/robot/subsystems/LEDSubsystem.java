@@ -9,11 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
@@ -69,14 +66,11 @@ public class LEDSubsystem extends SubsystemBase {
 
     m_patternIterator = m_patternList.listIterator();
     
-    m_currentPattern =  m_redPattern;
+    m_currentPattern =  m_bluePattern;
 
     AnalogInput.setGlobalSampleRate(50000);
     m_micSim = new AnalogInputSim(m_mic);
-
-
   }
-
 
   public void nextPattern() {
        if (!m_patternIterator.hasNext()) {
@@ -85,6 +79,13 @@ public class LEDSubsystem extends SubsystemBase {
       m_currentPattern = m_patternIterator.next();
   }
 
+public void setAllianceSoundMeter(Alliance color) {
+    if (color.equals(Alliance.Blue)) {
+      setPattern(m_blueSoundMeter);
+    } else {
+      setPattern(m_redSoundMeter);
+    }
+  }
 //   public void setConePattern() {
 //     setPattern(m_yellowPattern);
 //   }
@@ -97,14 +98,14 @@ public class LEDSubsystem extends SubsystemBase {
 //     setPattern(new SolidColorPattern(Color.kBlue));
 //   }
 
-//   public void setPattern(TrobotAddressableLEDPattern pattern) {
-//     m_currentPattern = pattern;
-//     var patternExists = m_patternList.contains(pattern);
-//     if (patternExists) {
-//         m_patternIterator = m_patternList.listIterator(
-//                                       m_patternList.indexOf(pattern));
-//     }
-//   }
+  public void setPattern(TrobotAddressableLEDPattern pattern) {
+    m_currentPattern = pattern;
+    var patternExists = m_patternList.contains(pattern);
+    if (patternExists) {
+        m_patternIterator = m_patternList.listIterator(
+                                      m_patternList.indexOf(pattern));
+    }
+  }
 
   @Override
   public void periodic() {

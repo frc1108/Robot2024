@@ -5,10 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -23,8 +21,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private Alliance m_alliance;
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -33,17 +29,18 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    //m_robotContainer = new RobotContainer();
   }
   
   @Override
   public void driverStationConnected() {
-    m_alliance = DriverStation.getAlliance().get();
-    if (m_alliance.equals(Alliance.Blue)) {
-      // Set LED color pattern
-      // Set Joystick driving X & Y driving directions
+    // m_alliance = DriverStation.getAlliance().get();
+    // if (m_alliance.equals(Alliance.Blue)) {
+    //   // Set LED color pattern
+    //   // Set Joystick driving X & Y driving directions
 
-    };
+    // }
+    m_robotContainer = new RobotContainer(DriverStation.getAlliance().get());
   }
 
   /**

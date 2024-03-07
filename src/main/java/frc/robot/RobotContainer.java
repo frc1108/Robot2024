@@ -5,22 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
@@ -31,11 +20,7 @@ import frc.robot.subsystems.HendersonLauncher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.util.List;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -60,12 +45,17 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     private final LEDSubsystem m_led = new LEDSubsystem();
+    private final Alliance m_allianceColor;
 
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  public RobotContainer() {
+  public RobotContainer(Alliance allianceColor) {
+    this.m_allianceColor = allianceColor;
+    m_led.setAllianceSoundMeter(m_allianceColor);
+    SmartDashboard.putString("Alliance Color",m_allianceColor.toString());
+
     // Configure the button bindings
     configureButtonBindings();
     configureNamedCommands();
@@ -77,8 +67,8 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                isBlueAlliance()?-1:1*MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                isBlueAlliance()?-1:1*MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
@@ -104,6 +94,7 @@ public class RobotContainer {
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
     //m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
+
 
 
     m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
@@ -149,5 +140,9 @@ public class RobotContainer {
 
   public Command intakeNote() {
     return Commands.sequence(Commands.parallel(m_launcher.runReverse(),m_feeder.runReverse()));
+  }
+
+  public boolean isBlueAlliance(){
+    return m_allianceColor.equals(Alliance.Blue);
   }
 }
