@@ -152,16 +152,19 @@ public final class Constants {
 
     public static final double kSportGearRatio = 36.0;
     public static final double kSportPinionTeeth = 10;
-    public static final double kArmSprocketTeeth = 52;
-    public static final double kArmGearRatio = 187.2;
+    public static final double kArmSprocketTeeth = 36;
+    public static final double kArmGearRatio = 129.6;
 
     // SysID values (in radians and radians/sec)
     public static final double kSVolts = 1.8; //0.11356;
     public static final double kGVolts = 0.5; //0.29175;
     public static final double kVVoltSecondPerRad = 7; //3.65; //1.5928;
     public static final double kAVoltSecondSquaredPerRad = 0.02;//0.030171;
+
+    // Set the arm speed and acceleration
     public static final double kMaxVelocityRadPerSecond = 1.5;
     public static final double kMaxAccelerationRadPerSecSquared = 2;
+
     public static final double kArmOffsetRads = Units.degreesToRadians(-45); //Starting angle
     public static final double kArmMaxRads = Units.degreesToRadians(90); //Ending angle
 
@@ -172,6 +175,7 @@ public final class Constants {
     public static final double kArmEncoderPositionPIDMaxInput = kArmMaxRads; 
 
     public static final int kArmMotorCurrentLimit = 40; // amps
+    
     public static final double kP = 4; //10000x
     public static final double kI = 0;
     public static final double kD = 0.5;
@@ -193,8 +197,9 @@ public final class Constants {
     public static final double kArmDeadband = 0.1;
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
-    public static final double kArmShootingAngleRads = Units.degreesToRadians(45);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-30);
+    public static final double kArmShootingAngleRads = Units.degreesToRadians(55);
+    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(25);
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-35);
     public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
   }
     

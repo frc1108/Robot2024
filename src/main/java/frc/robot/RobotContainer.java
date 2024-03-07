@@ -96,6 +96,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
 
     m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
@@ -106,10 +107,13 @@ public class RobotContainer {
 
     m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
+    m_operatorController.povRight().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads));
 
-    m_operatorController.x().whileTrue(m_launcher.run());//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
+    m_operatorController.x().whileTrue(Commands.runEnd(()->m_launcher.set(0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
+    m_operatorController.y().whileTrue(Commands.runEnd(()->m_launcher.set(-0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
     //m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
-    m_operatorController.b().whileTrue(m_feeder.run());//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+    m_operatorController.a().whileTrue(Commands.runEnd(()->m_feeder.set(0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+    m_operatorController.b().whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
   }
 
   /**
@@ -129,6 +133,7 @@ public class RobotContainer {
   private void configureAutoChooser() {
     autoChooser.setDefaultOption("Nothing", Commands.none());
     autoChooser.addOption("Test Auto", TestAuto());
+    SmartDashboard.putData("Auto Chooser",autoChooser);
   }
    
   public Command TestAuto() {
@@ -137,9 +142,5 @@ public class RobotContainer {
 
   public Command intakeNote() {
     return Commands.sequence(Commands.parallel(m_launcher.runReverse(),m_feeder.runReverse()));
-  }
-
-  public void periodic() {
-    SmartDashboard.putData(autoChooser);
   }
 }
