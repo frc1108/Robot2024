@@ -52,7 +52,7 @@ public class RobotContainer {
       vision = new Vision(m_robotDrive::visionPose);
     }
     catch (Exception e) {
-      DriverStation.reportWarning("UNable to initialize vision subsystem", e.getStackTrace());
+      DriverStation.reportWarning("Unable to initialize vision subsystem", e.getStackTrace());
     }
     
     configureButtonBindings();

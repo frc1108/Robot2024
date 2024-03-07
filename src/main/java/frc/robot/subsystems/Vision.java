@@ -23,12 +23,12 @@ public class Vision extends SubsystemBase {
     private final BiConsumer<Pose2d, Double> consumer;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) throws IOException {
-        photonCamera = new PhotonCamera(Constants.VisionConstants.kCameraName);
+        photonCamera = new PhotonCamera(Constants.VisionConstants.kTagCamera);
         poseEstimator = new PhotonPoseEstimator(
                 AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
                 PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 photonCamera,
-                Constants.VisionConstants.kCameraOffset);
+                Constants.VisionConstants.kTagCameraOffset);
         poseEstimator.setMultiTagFallbackStrategy(PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY);
         poseEstimator.setLastPose(new Pose2d());
         this.consumer = consumer;
@@ -37,31 +37,31 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         boolean connected = photonCamera.isConnected();
-        Logger.recordOutput("Vision/Connected", connected);
+        //Logger.recordOutput("Vision/Connected", connected);
         if (!connected)
             return;
 
         PhotonPipelineResult pipelineResult = photonCamera.getLatestResult();
         boolean hasTargets = pipelineResult.hasTargets();
-        Logger.recordOutput("Vision/HasTargets", hasTargets);
+        //Logger.recordOutput("Vision/HasTargets", hasTargets);
         if (!hasTargets)
             return;
 
-        PNPResult multiResult = pipelineResult.getMultiTagResult().estimatedPose;
-        boolean isPresent = multiResult.isPresent;
-        Logger.recordOutput("Vision/MultiPose", isPresent);
+        //PNPResult multiResult = pipelineResult.getMultiTagResult().estimatedPose;
+        //boolean isPresent = multiResult.isPresent;
+        //Logger.recordOutput("Vision/MultiPose", isPresent);
 
         Optional<EstimatedRobotPose> poseResult = poseEstimator.update(pipelineResult);
         boolean posePresent = poseResult.isPresent();
-        Logger.recordOutput("Vision/HasPose", posePresent);
+        //Logger.recordOutput("Vision/HasPose", posePresent);
         if (!posePresent)
             return;
 
         EstimatedRobotPose estimatedPose = poseResult.get();
-        Logger.recordOutput("Vision/Pose", estimatedPose.estimatedPose);
-        Logger.recordOutput("Vision/Timestamp", estimatedPose.timestampSeconds);
-        Logger.recordOutput("Vision/Targets", estimatedPose.targetsUsed.size());
-        Logger.recordOutput("Vision/Strategy", estimatedPose.strategy);
+        // Logger.recordOutput("Vision/Pose", estimatedPose.estimatedPose);
+        // Logger.recordOutput("Vision/Timestamp", estimatedPose.timestampSeconds);
+        // Logger.recordOutput("Vision/Targets", estimatedPose.targetsUsed.size());
+        // Logger.recordOutput("Vision/Strategy", estimatedPose.strategy);
         consumer.accept(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
     }
 }
