@@ -142,10 +142,18 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
+
+  public static final class LedConstants {
+    public static final int kLedPWMPort = 9;
+    public static final int kLedCount = 256;
+    public static final int kVolumeSensorPort = 3;
+  }
+
   public static final class UnderrollerConstants {
     public static final int kFrontCanId = 21;
     public static final int kRearCanId = 22;
   }
+  
   public static final class ArmConstants {
     public static final int kLeftArmMotorCanId = 31;
     public static final int kRightArmMotorCanId = 32;

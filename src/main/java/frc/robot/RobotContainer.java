@@ -13,8 +13,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -24,6 +24,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Underroller;
 import frc.robot.subsystems.HendersonFeeder;
 import frc.robot.subsystems.HendersonLauncher;
@@ -57,6 +58,9 @@ public class RobotContainer {
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    private final LEDSubsystem m_led = new LEDSubsystem();
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -96,8 +100,11 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
+    //m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
+
 
     m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
     m_operatorController.rightBumper().whileTrue(m_underroller.reverseUnderroller().withName("Outtaking"));
@@ -126,8 +133,8 @@ public class RobotContainer {
   }
 
   private void configureNamedCommands() {
-      NamedCommands.registerCommand("none", Commands.none());
-      NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
+      // NamedCommands.registerCommand("none", Commands.none());
+      // NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
     }
 
   private void configureAutoChooser() {
