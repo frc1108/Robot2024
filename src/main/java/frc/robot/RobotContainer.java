@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private final Arm m_arm = new Arm();
   private final HendersonFeeder m_feeder = new HendersonFeeder();
   private final HendersonLauncher m_launcher  = new HendersonLauncher();
+  private final LEDSubsystem m_led = new LEDSubsystem();
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -44,17 +46,14 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-    private final LEDSubsystem m_led = new LEDSubsystem();
-    private final Alliance m_allianceColor;
+    
+  private Alliance m_allianceColor;
 
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  public RobotContainer(Alliance allianceColor) {
-    this.m_allianceColor = allianceColor;
-    m_led.setAllianceSoundMeter(m_allianceColor);
-    SmartDashboard.putString("Alliance Color",m_allianceColor.toString());
+  public RobotContainer() {
 
     // Configure the button bindings
     configureButtonBindings();
@@ -144,5 +143,12 @@ public class RobotContainer {
 
   public boolean isBlueAlliance(){
     return m_allianceColor.equals(Alliance.Blue);
+  }
+
+  public void setAlliance() {
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      m_allianceColor = alliance.get();
+    }
   }
 }
