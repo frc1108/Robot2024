@@ -27,8 +27,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 2.4;
-    public static final double kMaxAngularSpeed = Math.PI; // radians per second
+    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
@@ -152,6 +152,7 @@ public final class Constants {
   public static final class UnderrollerConstants {
     public static final int kFrontCanId = 21;
     public static final int kRearCanId = 22;
+    public static final double kUnderrollerIntakeSpeed = 0.8;
   }
   
   public static final class ArmConstants {
@@ -206,9 +207,10 @@ public final class Constants {
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
     public static final double kArmShootingAngleRads = Units.degreesToRadians(55);
-    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(25);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-35);
+    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(45);
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-36);
     public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
+    public static final double kArmDownRads = Units.degreesToRadians(-44);
   }
     
   public static final class HendersonConstants {
@@ -217,5 +219,7 @@ public final class Constants {
     public static final int kLeftFeederMotorCanId = 43;
     public static final int kRightFeederMotorCanId = 44;
     public static final double kFeederGearRatio = 47/11;
+    public static final double kIntakeLauncherSpeed = 0.2;
+    public static final double kIntakeFeederSpeed = 0.45;
   }
 }

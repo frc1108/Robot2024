@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkLimitSwitch.Type;
@@ -20,6 +21,7 @@ public class HendersonFeeder extends SubsystemBase {
   private final CANSparkMax m_leftMotor = new CANSparkMax(HendersonConstants.kLeftFeederMotorCanId,MotorType.kBrushless);
   private final CANSparkMax m_rightMotor = new CANSparkMax(HendersonConstants.kRightFeederMotorCanId,MotorType.kBrushless);
   private final RelativeEncoder m_encoder;
+  private final SparkLimitSwitch m_LimitSwitch;
 
   /** Creates a new HendersonFeeder. */
   public HendersonFeeder() {
@@ -29,6 +31,7 @@ public class HendersonFeeder extends SubsystemBase {
     m_rightMotor.setIdleMode(IdleMode.kBrake);
     m_rightMotor.follow(m_leftMotor, true);
     m_encoder = m_leftMotor.getEncoder();
+    m_LimitSwitch = m_leftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
 
     m_leftMotor.burnFlash();
@@ -43,6 +46,14 @@ public class HendersonFeeder extends SubsystemBase {
     return m_leftMotor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
   }
 
+  public void enableLimitSwitches(){
+    m_LimitSwitch.enableLimitSwitch(true);
+  }
+
+  public void disableLimitSwitches(){
+    m_LimitSwitch.enableLimitSwitch(false);
+  }
+
   public Command run(){
     return Commands.runOnce(()->set(0.5));
   }
@@ -54,8 +65,8 @@ public class HendersonFeeder extends SubsystemBase {
   }
 
   public Command runStopCommand(){
-    return Commands.sequence(runOnce(()->set(0.5)),
-             Commands.race(Commands.waitSeconds(2),
+    return Commands.sequence(runOnce(()->set(0.8)),
+             Commands.race(Commands.waitSeconds(5),
                            Commands.waitUntil(this::getBeamBreak)),
              runOnce(()->set(0)).withName("Beam Feeder"));
   }
@@ -63,6 +74,7 @@ public class HendersonFeeder extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Beam Break Pressed", getBeamBreak());
+    SmartDashboard.putNumber("Feeder Speed",m_encoder.getVelocity());
     // This method will be called once per scheduler run
   }
 }

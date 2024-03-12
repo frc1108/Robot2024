@@ -38,12 +38,12 @@ public class Robot extends TimedRobot {
   
   @Override
   public void driverStationConnected() {
-    m_alliance = DriverStation.getAlliance().get();
-    if (m_alliance.equals(Alliance.Blue)) {
-      // Set LED color pattern
-      // Set Joystick driving X & Y driving directions
-
-    };
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      m_robotContainer.configureWithAlliance(alliance.get());
+    } else {
+      m_robotContainer.configureWithAlliance(Alliance.Blue);
+    }
   }
 
   /**

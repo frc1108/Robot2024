@@ -17,11 +17,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.HendersonConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.UnderrollerConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
@@ -103,7 +106,7 @@ public class RobotContainer {
 
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
-    //m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
+    m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
 
 
     m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
@@ -115,12 +118,15 @@ public class RobotContainer {
     m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
     m_operatorController.povRight().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads));
+    m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
 
     m_operatorController.x().whileTrue(Commands.runEnd(()->m_launcher.set(0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
     m_operatorController.y().whileTrue(Commands.runEnd(()->m_launcher.set(-0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
+    m_operatorController.start().onTrue(shoot());
     //m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
     m_operatorController.a().whileTrue(Commands.runEnd(()->m_feeder.set(0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
     m_operatorController.b().whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+    m_operatorController.back().onTrue(intakeNote()); //whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
   }
 
   /**
@@ -142,12 +148,47 @@ public class RobotContainer {
     autoChooser.addOption("Test Auto", TestAuto());
     SmartDashboard.putData("Auto Chooser",autoChooser);
   }
+
+  public void configureWithAlliance(Alliance allianceColor) {
+
+  }
    
   public Command TestAuto() {
       return new PathPlannerAuto("Test Auto");
   }
 
   public Command intakeNote() {
-    return Commands.sequence(Commands.parallel(m_launcher.runReverse(),m_feeder.runReverse()));
+    return 
+      Commands.sequence(
+        m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads),
+        Commands.waitSeconds(0.1),
+        Commands.parallel(
+          Commands.runOnce(()->m_launcher.set(HendersonConstants.kIntakeLauncherSpeed),m_launcher),
+          Commands.runOnce(()->m_feeder.set(HendersonConstants.kIntakeFeederSpeed),m_feeder),
+          Commands.runOnce(()->m_underroller.setUnderrollerspeed(UnderrollerConstants.kUnderrollerIntakeSpeed),m_underroller),
+          Commands.runOnce(()->m_led.yellow()),
+          Commands.runOnce(()->m_feeder.enableLimitSwitches())),
+        Commands.race(Commands.waitUntil(()->m_feeder.getBeamBreak()),Commands.waitSeconds(5)),
+          Commands.parallel(
+          Commands.runOnce(()->m_launcher.set(0),m_launcher),
+          Commands.runOnce(()->m_feeder.set(0),m_feeder),
+          Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller),
+          Commands.runOnce(()->m_feeder.disableLimitSwitches())),
+        Commands.waitSeconds(0.5),
+        Commands.runOnce(()->m_led.off())
+        );
+  }
+
+  public Command shoot() {
+    return Commands.sequence(
+        m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads),
+        Commands.waitSeconds(0.5),
+        Commands.runOnce(()->m_launcher.set(-0.8)),
+        Commands.waitSeconds(0.75),
+        Commands.runOnce(()->m_feeder.set(-0.6)),
+        Commands.waitSeconds(0.2),
+        Commands.runOnce(()->m_feeder.set(0)),
+        Commands.runOnce(()->m_launcher.set(0))
+     );
   }
 }

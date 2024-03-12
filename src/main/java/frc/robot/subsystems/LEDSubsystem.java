@@ -19,12 +19,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LedConstants;
 import frc.utils.led.TrobotAddressableLED;
 import frc.utils.led.TrobotAddressableLEDPattern;
 import frc.utils.led.patterns.matrix.ColorSoundMeter;
 import frc.utils.led.patterns.matrix.MultiColorMeter;
+import frc.utils.led.patterns.strip.BlinkingPattern;
 import frc.utils.led.patterns.strip.ChaosPattern;
 import frc.utils.led.patterns.strip.RainbowPattern;
 import frc.utils.led.patterns.strip.SolidColorPattern;
@@ -33,15 +36,17 @@ public class LEDSubsystem extends SubsystemBase {
   private TrobotAddressableLED m_led = new TrobotAddressableLED(LedConstants.kLedPWMPort,
                                        LedConstants.kLedCount);
 
+  
   private TrobotAddressableLEDPattern m_bluePattern = new SolidColorPattern(Color.kBlue);
+  private TrobotAddressableLEDPattern m_blackPattern = new SolidColorPattern(Color.kBlack);
 	private TrobotAddressableLEDPattern m_redPattern = new SolidColorPattern(Color.kRed);
 	private TrobotAddressableLEDPattern m_purplePattern = new SolidColorPattern(Color.kPurple);
 	private TrobotAddressableLEDPattern m_yellowPattern = new SolidColorPattern(Color.kYellow);
+	private TrobotAddressableLEDPattern m_flashPattern = new BlinkingPattern(Color.kWhite,0.1);
 	private TrobotAddressableLEDPattern m_disabledPattern = new RainbowPattern();
 	private TrobotAddressableLEDPattern m_rainbowMeter; 
 	private TrobotAddressableLEDPattern m_blueSoundMeter; 
 	private TrobotAddressableLEDPattern m_redSoundMeter;
-	private TrobotAddressableLEDPattern m_chaos = new ChaosPattern();
 
   
   private TrobotAddressableLEDPattern m_currentPattern;
@@ -62,7 +67,7 @@ public class LEDSubsystem extends SubsystemBase {
     // m_redSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kRed);
 
     m_patternList = new ArrayList<TrobotAddressableLEDPattern>
-                        (Arrays.asList(m_redPattern,m_bluePattern,m_chaos,
+                        (Arrays.asList(m_redPattern,m_bluePattern,m_blackPattern,m_flashPattern,
                                        m_yellowPattern, m_purplePattern,
                                        m_disabledPattern,m_rainbowMeter,m_blueSoundMeter,m_redSoundMeter));
 
@@ -85,6 +90,17 @@ public class LEDSubsystem extends SubsystemBase {
       m_currentPattern = m_patternIterator.next();
   }
 
+  public void flash(){
+    setPattern(m_flashPattern);
+  }
+
+  public void off() {
+    setPattern(m_blackPattern);
+  }
+
+  public void yellow() {
+    setPattern(m_yellowPattern);
+  }
 //   public void setConePattern() {
 //     setPattern(m_yellowPattern);
 //   }
@@ -97,14 +113,14 @@ public class LEDSubsystem extends SubsystemBase {
 //     setPattern(new SolidColorPattern(Color.kBlue));
 //   }
 
-//   public void setPattern(TrobotAddressableLEDPattern pattern) {
-//     m_currentPattern = pattern;
-//     var patternExists = m_patternList.contains(pattern);
-//     if (patternExists) {
-//         m_patternIterator = m_patternList.listIterator(
-//                                       m_patternList.indexOf(pattern));
-//     }
-//   }
+  public void setPattern(TrobotAddressableLEDPattern pattern) {
+    m_currentPattern = pattern;
+    var patternExists = m_patternList.contains(pattern);
+    if (patternExists) {
+        m_patternIterator = m_patternList.listIterator(
+                                      m_patternList.indexOf(pattern));
+    }
+  }
 
   @Override
   public void periodic() {
