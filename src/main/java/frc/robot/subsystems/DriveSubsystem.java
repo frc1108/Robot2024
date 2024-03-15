@@ -15,7 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.wpilibj.DriverStation;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -82,11 +82,20 @@ public class DriveSubsystem extends SubsystemBase {
       new HolonomicPathFollowerConfig(
         new PIDConstants(AutoConstants.kPXController,0,0),
         new PIDConstants(AutoConstants.kPThetaController,0,0),
-        DriveConstants.kMaxSpeedMetersPerSecond, // max speed in m/s
-        Units.inchesToMeters(Math.sqrt(Math.pow(23.5, 2)+Math.pow(23.5,2))/2), // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
+        DriveConstants.kMaxSpeedMetersPerSecond - 0.3, // max speed in m/s
+        Math.sqrt(Math.pow(DriveConstants.kTrackWidth, 2)+Math.pow(DriveConstants.kWheelBase,2))/2, // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
         new ReplanningConfig()
       ),
-      ()->true, // should flip path boolean supplier
+      ()->{// Boolean supplier that controls when the path will be mirrored for the red alliance
+        // This will flip the path being followed to the red side of the field.
+        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+          return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
+      }, // should flip path boolean supplier
       this
     );
   }
@@ -107,7 +116,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("pose angle", m_odometry.getPoseMeters().getRotation().getDegrees());
     SmartDashboard.putNumber("pose X", m_odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("pose Y", m_odometry.getPoseMeters().getY());
-
 
 
   }
