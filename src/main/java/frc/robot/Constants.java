@@ -93,10 +93,15 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    public static final double kDrivingP = 0.04;
+    // Recalc values for arbfeedForward
+    // public static final double kDrivingkS = 0.0; 
+    // public static final double kDrivingkV = 2.09; //2.11
+    // public static final double kDrivingkA = 0.39; //0.39
+
+    public static final double kDrivingP = 0.05; //0.04
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
-    public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+    public static final double kDrivingFF = 0.92 / kDriveWheelFreeSpeedRps;
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
@@ -121,14 +126,14 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1.5;
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 4;
-    public static final double kPYController = 4;
-    public static final double kPThetaController = 2;
+    public static final double kPXController = 1.8;
+    public static final double kPYController = 1.8;
+    public static final double kPThetaController = 1;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
@@ -208,7 +213,7 @@ public final class Constants {
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
     public static final double kArmShootingAngleRads = Units.degreesToRadians(55);
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(45);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-36);
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-38); //36
     public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
     public static final double kArmDownRads = Units.degreesToRadians(-44);
   }

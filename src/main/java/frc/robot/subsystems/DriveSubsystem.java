@@ -116,6 +116,10 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("pose angle", m_odometry.getPoseMeters().getRotation().getDegrees());
     SmartDashboard.putNumber("pose X", m_odometry.getPoseMeters().getX());
     SmartDashboard.putNumber("pose Y", m_odometry.getPoseMeters().getY());
+    SmartDashboard.putNumber("left front speed",m_frontLeft.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("left rear speed",m_rearLeft.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("right front speed",m_frontRight.getState().speedMetersPerSecond);
+    SmartDashboard.putNumber("right rear speed",m_rearRight.getState().speedMetersPerSecond);
 
 
   }

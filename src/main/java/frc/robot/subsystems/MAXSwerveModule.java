@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -16,6 +17,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public class MAXSwerveModule {
@@ -31,6 +33,7 @@ public class MAXSwerveModule {
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
+  //private SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(ModuleConstants.kDrivingkS, ModuleConstants.kDrivingkV, ModuleConstants.kDrivingkA);
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
    * encoder, and PID controller. This configuration is specific to the REV
@@ -59,6 +62,8 @@ public class MAXSwerveModule {
     // but we want meters and meters per second to use with WPILib's swerve APIs.
     m_drivingEncoder.setPositionConversionFactor(ModuleConstants.kDrivingEncoderPositionFactor);
     m_drivingEncoder.setVelocityConversionFactor(ModuleConstants.kDrivingEncoderVelocityFactor);
+    m_drivingEncoder.setAverageDepth(2);
+    m_drivingEncoder.setMeasurementPeriod(16);
 
     // Apply position and velocity conversion factors for the turning encoder. We
     // want these in radians and radians per second to use with WPILib's swerve
@@ -152,6 +157,7 @@ public class MAXSwerveModule {
         new Rotation2d(m_turningEncoder.getPosition()));
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
+    //m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity,0,m_feedforward.calculate(optimizedDesiredState.speedMetersPerSecond,optimizedDesiredState.));
     m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 
