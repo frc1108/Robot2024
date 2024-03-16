@@ -5,10 +5,13 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.HendersonConstants;
 import frc.robot.Constants.OIConstants;
@@ -29,13 +32,16 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import monologue.Monologue;
+import monologue.Logged;
+
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer implements Logged{
   private final Field2d field;
 
   // The robot's subsystems
@@ -84,6 +90,7 @@ public class RobotContainer {
     configureButtonBindings();
     configureNamedCommands();
     configureAutoChooser();
+    setupMonologue();
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -135,7 +142,7 @@ public class RobotContainer {
     m_operatorController.y().whileTrue(Commands.runEnd(()->m_launcher.set(-0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
     m_operatorController.start().onTrue(shoot());
     //m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
-    m_operatorController.a().whileTrue(Commands.runEnd(()->m_feeder.set(0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
+    m_operatorController.a().whileTrue(Commands.runEnd(()->m_feeder.set(1),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
     m_operatorController.b().whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
     m_operatorController.back().onTrue(intakeNote()); //whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
   }
@@ -153,6 +160,8 @@ public class RobotContainer {
       // NamedCommands.registerCommand("none", Commands.none());
       NamedCommands.registerCommand("LaunchNote", shoot());
       NamedCommands.registerCommand("IntakeNote", intakeNote());
+      NamedCommands.registerCommand("ShootBackwards", shootBackwards());
+      NamedCommands.registerCommand("CenteringNote", centeringNote());
       // NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
     }
 
@@ -160,11 +169,13 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Nothing", Commands.none());
     autoChooser.addOption("Test Auto", TestAuto());
     autoChooser.addOption("Two Note Left", TwoNoteLeft());
+    autoChooser.addOption("Two Note Center", TwoNoteCenter());
+    autoChooser.addOption("Three Note Center", ThreeNoteCenter());
     SmartDashboard.putData("Auto Chooser",autoChooser);
   }
 
-  public void configureWithAlliance(Alliance allianceColor) {
-
+  public void configureWithAlliance(Alliance alliance) {
+    m_led.startCrowdMeter(alliance);
   }
    
   public Command TestAuto() {
@@ -173,6 +184,14 @@ public class RobotContainer {
 
   public Command TwoNoteLeft() {
       return new PathPlannerAuto("Two Note Left");
+  }
+
+  public Command TwoNoteCenter() {
+      return new PathPlannerAuto("Two Note Center");
+  }
+
+  public Command ThreeNoteCenter() {
+      return new PathPlannerAuto("Three Note Center");
   }
 
   public Command intakeNote() {
@@ -208,5 +227,43 @@ public class RobotContainer {
         Commands.runOnce(()->m_feeder.set(0)),
         Commands.runOnce(()->m_launcher.set(0))
      );
+  }
+
+    public Command shootBackwards() {
+    return Commands.sequence(
+      Commands.runOnce(()->m_feeder.disableLimitSwitches()),
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads-Units.degreesToRadians(2)),
+      Commands.waitSeconds(0.2),
+      Commands.runOnce(()->m_feeder.set(1)),
+      Commands.waitSeconds(0.25),
+      Commands.runOnce(()->m_launcher.set(0.8)),
+      Commands.waitSeconds(0.75)).andThen(
+        Commands.parallel(
+                        Commands.runOnce(()->m_launcher.set(0.0)),
+                        Commands.runOnce(()->m_feeder.set(0.0)))
+                          );
+  }
+
+  public Command centeringNote() {
+    return Commands.sequence(
+      Commands.runOnce(()->m_feeder.disableLimitSwitches()),
+      Commands.parallel(Commands.runOnce(()->m_launcher.set(-0.1)),
+                        Commands.runOnce(()->m_feeder.set(-0.5))),
+      Commands.waitSeconds(0.1)).andThen(
+        Commands.parallel(
+                        Commands.runOnce(()->m_launcher.set(0.0)),
+                        Commands.runOnce(()->m_feeder.set(0.0)))
+                          );
+  }
+
+  public void setupMonologue() {
+    boolean fileOnly = false;
+    boolean lazyLogging = false;
+    Monologue.setupMonologue(this,"RobotContainer",fileOnly,lazyLogging);
+  }
+
+  public void runPeriodic() {
+    Monologue.setFileOnly(DriverStation.isFMSAttached());
+    Monologue.updateAll();
   }
 }

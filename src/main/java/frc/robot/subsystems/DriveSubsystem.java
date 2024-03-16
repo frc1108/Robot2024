@@ -80,7 +80,7 @@ public class DriveSubsystem extends SubsystemBase {
       this::getRobotRelativeSpeeds,
       this::driveRobotRelative,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(AutoConstants.kPXController,0,0),
+        new PIDConstants(AutoConstants.kPXController,0,AutoConstants.kDXController),
         new PIDConstants(AutoConstants.kPThetaController,0,0),
         DriveConstants.kMaxSpeedMetersPerSecond - 0.3, // max speed in m/s
         Math.sqrt(Math.pow(DriveConstants.kTrackWidth, 2)+Math.pow(DriveConstants.kWheelBase,2))/2, // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2

@@ -75,7 +75,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = VortexMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.07526; // 0.0762
+    public static final double kWheelDiameterMeters = 0.0762; //0.07526; // 0.0762
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -98,10 +98,10 @@ public final class Constants {
     // public static final double kDrivingkV = 2.09; //2.11
     // public static final double kDrivingkA = 0.39; //0.39
 
-    public static final double kDrivingP = 0.05; //0.04
+    public static final double kDrivingP = 0.04; //0.04
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
-    public static final double kDrivingFF = 0.92 / kDriveWheelFreeSpeedRps;
+    public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
@@ -131,8 +131,10 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 1.8;
-    public static final double kPYController = 1.8;
+    public static final double kPXController = 2;
+    public static final double kDXController = 0;
+
+    public static final double kPYController = 2;
     public static final double kPThetaController = 1;
 
     // Constraint for the motion profiled robot angle controller
@@ -211,11 +213,11 @@ public final class Constants {
     public static final double kArmDeadband = 0.1;
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
-    public static final double kArmShootingAngleRads = Units.degreesToRadians(55);
+    public static final double kArmShootingAngleRads = Units.degreesToRadians(62.5);
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(45);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-38); //36
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-36); //38
     public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-44);
+    public static final double kArmDownRads = Units.degreesToRadians(-44+12);
   }
     
   public static final class HendersonConstants {
