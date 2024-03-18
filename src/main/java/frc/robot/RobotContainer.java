@@ -26,13 +26,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import monologue.Monologue;
+import monologue.Annotations.Log;
 import monologue.Logged;
 
 /*
@@ -42,59 +45,35 @@ import monologue.Logged;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer implements Logged{
-  private final Field2d field;
-
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Underroller m_underroller = new Underroller();
   private final Arm m_arm = new Arm();
   private final HendersonFeeder m_feeder = new HendersonFeeder();
   private final HendersonLauncher m_launcher  = new HendersonLauncher();
+  private final LEDSubsystem m_led = new LEDSubsystem();
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
-  private final LEDSubsystem m_led = new LEDSubsystem();
-
+  @Log.NT private final Field2d m_field;
+  @Log.NT private final SendableChooser<Command> m_autoChooser;
   private int m_invertDriveAlliance = -1;
-
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  public RobotContainer() {
-
-            field = new Field2d();
-        SmartDashboard.putData("Field", field);
-
-        // Logging callback for current robot pose
-        PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-            // Do whatever you want with the pose here
-            field.setRobotPose(pose);
-        });
-
-        // Logging callback for target robot pose
-        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-          // Do whatever you want with the pose here
-          field.getObject("target pose").setPose(pose);
-      });
-
-      // Logging callback for the active path, this is sent as a list of poses
-      PathPlannerLogging.setLogActivePathCallback((poses) -> {
-          // Do whatever you want with the poses here
-          field.getObject("path").setPoses(poses);
-      });
-
-    // Configure the button bindings
+  public RobotContainer() { 
+    m_field = new Field2d();
+    
+    // Robot configs
     configureButtonBindings();
     configureNamedCommands();
-    configureAutoChooser();
+    m_autoChooser = AutoBuilder.buildAutoChooser();
     setupMonologue();
-
-    // Configure default commands
+    setupPathPlannerLog();
+    // Default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -155,7 +134,7 @@ public class RobotContainer implements Logged{
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return m_autoChooser.getSelected();
   }
 
   private void configureNamedCommands() {
@@ -168,34 +147,34 @@ public class RobotContainer implements Logged{
     }
 
   private void configureAutoChooser() {
-    autoChooser.setDefaultOption("Nothing", Commands.none());
-    autoChooser.addOption("Test Auto", TestAuto());
-    autoChooser.addOption("Two Note Left", TwoNoteLeft());
-    autoChooser.addOption("Two Note Center", TwoNoteCenter());
-    autoChooser.addOption("Three Note Center", ThreeNoteCenter());
-    SmartDashboard.putData("Auto Chooser",autoChooser);
-  }
+  //   autoChooser.setDefaultOption("Nothing", Commands.none());
+  //   autoChooser.addOption("Test Auto", TestAuto());
+  //   autoChooser.addOption("Two Note Left", TwoNoteLeft());
+  //   autoChooser.addOption("Two Note Center", TwoNoteCenter());
+  //   autoChooser.addOption("Three Note Center", ThreeNoteCenter());
+  //   SmartDashboard.putData("Auto Chooser",autoChooser);
+   }
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
     m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:1;
   }
    
-  public Command TestAuto() {
-      return new PathPlannerAuto("Test Auto");
-  }
+  // public Command TestAuto() {
+  //     return new PathPlannerAuto("Test Auto");
+  // }
 
-  public Command TwoNoteLeft() {
-      return new PathPlannerAuto("Two Note Left");
-  }
+  // public Command TwoNoteLeft() {
+  //     return new PathPlannerAuto("Two Note Left");
+  // }
 
-  public Command TwoNoteCenter() {
-      return new PathPlannerAuto("Two Note Center");
-  }
+  // public Command TwoNoteCenter() {
+  //     return new PathPlannerAuto("Two Note Center");
+  // }
 
-  public Command ThreeNoteCenter() {
-      return new PathPlannerAuto("Three Note Center");
-  }
+  // public Command ThreeNoteCenter() {
+  //     return new PathPlannerAuto("Three Note Center");
+  // }
 
   public Command intakeNote() {
     return 
@@ -268,5 +247,25 @@ public class RobotContainer implements Logged{
   public void runPeriodic() {
     Monologue.setFileOnly(DriverStation.isFMSAttached());
     Monologue.updateAll();
+  }
+
+  private void setupPathPlannerLog() {
+    // Logging callback for current robot pose
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+        // Do whatever you want with the pose here
+        m_field.setRobotPose(pose);
+    });
+
+    // Logging callback for target robot pose
+    PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+      // Do whatever you want with the pose here
+      m_field.getObject("target pose").setPose(pose);
+    });
+
+    // Logging callback for the active path, this is sent as a list of poses
+    PathPlannerLogging.setLogActivePathCallback((poses) -> {
+      // Do whatever you want with the poses here
+      m_field.getObject("path").setPoses(poses);
+    });
   }
 }
