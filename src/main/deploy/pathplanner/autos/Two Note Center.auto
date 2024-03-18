@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8,
-      "y": 6.75
+      "x": 1.45,
+      "y": 5.55
     },
-    "rotation": 60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftSWToRingA"
+                  "pathName": "CenterSWToRingB"
                 }
               },
               {
@@ -49,15 +49,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "RingAToLeftSW"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CenteringNote"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RingBToCenterSW"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "CenteringNote"
+                }
+              }
+            ]
           }
         },
         {
