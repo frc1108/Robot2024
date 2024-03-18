@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,7 +63,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+  SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(-m_gyro.getAngle()),
       new SwerveModulePosition[] {
@@ -70,7 +71,10 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      },
+      new Pose2d());
+
+
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -113,9 +117,9 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     SmartDashboard.putNumber("gyro angle", m_gyro.getAngle());
-    SmartDashboard.putNumber("pose angle", m_odometry.getPoseMeters().getRotation().getDegrees());
-    SmartDashboard.putNumber("pose X", m_odometry.getPoseMeters().getX());
-    SmartDashboard.putNumber("pose Y", m_odometry.getPoseMeters().getY());
+    SmartDashboard.putNumber("pose angle", m_odometry.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putNumber("pose X", m_odometry.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("pose Y", m_odometry.getEstimatedPosition().getY());
     SmartDashboard.putNumber("left front speed",m_frontLeft.getState().speedMetersPerSecond);
     SmartDashboard.putNumber("left rear speed",m_rearLeft.getState().speedMetersPerSecond);
     SmartDashboard.putNumber("right front speed",m_frontRight.getState().speedMetersPerSecond);
@@ -130,7 +134,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();
   }
 
   /**
@@ -148,6 +152,10 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         },
         pose);
+  }
+
+  public void visionPose(Pose2d pose,double timestamp){
+    m_odometry.addVisionMeasurement(pose, timestamp);
   }
 
   /**

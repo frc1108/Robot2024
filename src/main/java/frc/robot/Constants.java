@@ -6,7 +6,11 @@ package frc.robot;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -229,4 +233,18 @@ public final class Constants {
     public static final double kIntakeLauncherSpeed = 0.2;
     public static final double kIntakeFeederSpeed = 0.45;
   }
+
+  public static final class VisionConstants {
+        public static final String kCameraName = "Tag Camera OV9281";
+        public static final Transform3d kCameraOffset = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(1.0),
+                Units.inchesToMeters(-11.5),
+                Units.inchesToMeters(8.50)),
+            new Rotation3d(
+                0.0,
+                Rotation2d.fromDegrees(25.0).getRadians(),
+                Rotation2d.fromDegrees(170).getRadians()
+            ));
+    }
 }

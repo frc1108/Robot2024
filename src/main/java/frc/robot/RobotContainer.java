@@ -20,6 +20,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Underroller;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.HendersonFeeder;
 import frc.robot.subsystems.HendersonLauncher;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +29,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+
+import java.io.IOException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -52,6 +55,7 @@ public class RobotContainer implements Logged{
   private final HendersonFeeder m_feeder = new HendersonFeeder();
   private final HendersonLauncher m_launcher  = new HendersonLauncher();
   private final LEDSubsystem m_led = new LEDSubsystem();
+  private Vision m_vision;
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -73,6 +77,13 @@ public class RobotContainer implements Logged{
     m_autoChooser = AutoBuilder.buildAutoChooser();
     setupMonologue();
     setupPathPlannerLog();
+    try {
+      m_vision = new Vision(m_robotDrive::visionPose);
+    }
+     catch(IOException e) {
+     DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
+    }
+
     // Default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -157,7 +168,7 @@ public class RobotContainer implements Logged{
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
-    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:1;
+    m_invertDriveAlliance = (alliance == Alliance.Blue)?1:-1;
   }
    
   // public Command TestAuto() {
