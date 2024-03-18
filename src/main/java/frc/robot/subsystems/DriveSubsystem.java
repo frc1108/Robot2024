@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,10 +14,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import java.util.function.DoubleSupplier;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -62,6 +71,11 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
+  private final PhotonCamera noteCam = new PhotonCamera("Note Camera OV9782");
+  private final PhotonPipelineResult noteTarget = new PhotonPipelineResult();
+  private final Constraints pidConstraints = new Constraints(3, 3);
+  private final ProfiledPIDController pid = new ProfiledPIDController(5.0, 0, 0, pidConstraints);
+
   // Odometry class for tracking robot pose
   SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
@@ -84,9 +98,9 @@ public class DriveSubsystem extends SubsystemBase {
       this::getRobotRelativeSpeeds,
       this::driveRobotRelative,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(AutoConstants.kPXController,0,AutoConstants.kDXController),
+        new PIDConstants(AutoConstants.kPXController,0,0),
         new PIDConstants(AutoConstants.kPThetaController,0,0),
-        DriveConstants.kMaxSpeedMetersPerSecond - 0.3, // max speed in m/s
+        DriveConstants.kMaxSpeedMetersPerSecond, // max speed in m/s
         Math.sqrt(Math.pow(DriveConstants.kTrackWidth, 2)+Math.pow(DriveConstants.kWheelBase,2))/2, // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
         new ReplanningConfig()
       ),
@@ -240,6 +254,16 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void driveRobotRelative(ChassisSpeeds speeds){
     this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
+  }
+
+  public void drivetoNote(DoubleSupplier speed){
+    var speeds = new ChassisSpeeds();
+    var result = noteTarget.getBestTarget();
+    PhotonUtils.estimateCameraToTarget(m_prevTime, m_currentTranslationMag, m_currentTranslationDir, m_currentRotation)
+    speeds.omegaRadiansPerSecond = 0;
+    speeds.omegaRadiansPerSecond = 0;
+    speeds.omegaRadiansPerSecond = 0;
+    this.driveRobotRelative(speeds);
   }
   
   public ChassisSpeeds getRobotRelativeSpeeds(){
