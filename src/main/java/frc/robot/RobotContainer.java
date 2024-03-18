@@ -57,7 +57,9 @@ public class RobotContainer implements Logged{
 
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-    private final LEDSubsystem m_led = new LEDSubsystem();
+  private final LEDSubsystem m_led = new LEDSubsystem();
+
+  private int m_invertDriveAlliance = -1;
 
 
   /**
@@ -98,8 +100,8 @@ public class RobotContainer implements Logged{
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                m_invertDriveAlliance*MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+                m_invertDriveAlliance*MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
@@ -176,6 +178,7 @@ public class RobotContainer implements Logged{
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
+    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:1;
   }
    
   public Command TestAuto() {

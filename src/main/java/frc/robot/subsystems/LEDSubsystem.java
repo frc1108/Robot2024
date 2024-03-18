@@ -60,8 +60,8 @@ public class LEDSubsystem extends SubsystemBase {
   /** Creates a new LEDSubsystem. */
   public LEDSubsystem() {
     m_rainbowMeter = new MultiColorMeter(()->this.getMicOutput());
-    m_blueSoundMeter = new ColorSoundMeter(()->this.getMicOutput(),Color.kBlue);
-    m_redSoundMeter = new ColorSoundMeter(()->this.getMicOutput(),Color.kRed);
+    m_blueSoundMeter = new ColorSoundMeter(()->0.5*this.getMicOutput(),Color.kBlue);
+    m_redSoundMeter = new ColorSoundMeter(()->0.5*this.getMicOutput(),Color.kRed);
     // m_rainbowMeter = new MultiColorMeter(()->m_controller.getRightTriggerAxis());
     // m_blueSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kBlue);
     // m_redSoundMeter = new ColorSoundMeter(()->m_controller.getRightTriggerAxis(),Color.kRed);
