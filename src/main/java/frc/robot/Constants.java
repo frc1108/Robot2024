@@ -218,7 +218,7 @@ public final class Constants {
     public static final double kArmShootingAngleRads = Units.degreesToRadians(62.5);
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(45);
     public static final double kArmPickupAngleRads = Units.degreesToRadians(-36); //38
-    public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
+    //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
     public static final double kArmDownRads = Units.degreesToRadians(-44+12);
   }
     
@@ -249,7 +249,7 @@ public final class Constants {
     public static double kLauncherIntakeNoteSpeed = -0.75; // Launcher --> Feeder
     public static double kLauncherShootNoteBackSpeed = -0.75; // Launcher --> Feeder
     public static double kLauncherCenteringSpeed = 0.1; // Launcher --> EXIT
-    
+
 
 
 
