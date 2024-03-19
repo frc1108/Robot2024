@@ -24,11 +24,11 @@ public class Vision extends SubsystemBase {
     private final BiConsumer<Pose2d, Double> consumer;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) throws IOException{
-        photonCamera = new PhotonCamera(Constants.VisionConstants.kCameraName);
+        photonCamera = new PhotonCamera(Constants.TagVisionConstants.kCameraName);
         poseEstimator = new PhotonPoseEstimator(
             AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
             PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            Constants.VisionConstants.kCameraOffset);
+            Constants.TagVisionConstants.kCameraOffset);
         this.consumer = consumer;
     }
 

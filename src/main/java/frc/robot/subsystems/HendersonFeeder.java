@@ -16,23 +16,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HendersonConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class HendersonFeeder extends SubsystemBase {
+public class HendersonFeeder extends SubsystemBase implements Logged {
   private final CANSparkMax m_leftMotor = new CANSparkMax(HendersonConstants.kLeftFeederMotorCanId,MotorType.kBrushless);
   private final CANSparkMax m_rightMotor = new CANSparkMax(HendersonConstants.kRightFeederMotorCanId,MotorType.kBrushless);
   private final RelativeEncoder m_encoder;
-  private final SparkLimitSwitch m_LimitSwitch;
+  private final SparkLimitSwitch m_limitSwitch;
 
   /** Creates a new HendersonFeeder. */
   public HendersonFeeder() {
     m_leftMotor.restoreFactoryDefaults();
     m_rightMotor.restoreFactoryDefaults();
+
     m_leftMotor.setIdleMode(IdleMode.kBrake);
     m_rightMotor.setIdleMode(IdleMode.kBrake);
+
     m_rightMotor.follow(m_leftMotor, true);
     m_encoder = m_leftMotor.getEncoder();
-    m_LimitSwitch = m_leftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
+    m_limitSwitch = m_leftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     m_leftMotor.burnFlash();
     m_rightMotor.burnFlash();
@@ -42,24 +46,25 @@ public class HendersonFeeder extends SubsystemBase {
     m_leftMotor.set(speed);
   }
 
+  @Log.NT(key = "Note Sensor Triggered")
   public boolean getBeamBreak(){
     return m_leftMotor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
   }
 
   public void enableLimitSwitches(){
-    m_LimitSwitch.enableLimitSwitch(true);
+    m_limitSwitch.enableLimitSwitch(true);
   }
 
   public void disableLimitSwitches(){
-    m_LimitSwitch.enableLimitSwitch(false);
+    m_limitSwitch.enableLimitSwitch(false);
   }
 
-  public Command run(){
-    return Commands.runOnce(()->set(0.5));
-  }
-  public Command runReverse(){
-    return Commands.runOnce(()->set(-0.35));
-  }
+  // public Command run(){
+  //   return Commands.runOnce(()->set(0.5));
+  // }
+  // public Command runReverse(){
+  //   return Commands.runOnce(()->set(-0.35));
+  // }
   public Command stop() {
     return Commands.runOnce(()->set(0));
   }
@@ -73,8 +78,6 @@ public class HendersonFeeder extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Beam Break Pressed", getBeamBreak());
     SmartDashboard.putNumber("Feeder Speed",m_encoder.getVelocity());
-    // This method will be called once per scheduler run
   }
 }

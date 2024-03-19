@@ -102,6 +102,10 @@ public class LEDSubsystem extends SubsystemBase {
     setPattern(m_yellowPattern);
   }
 
+  public void rainbow() {
+    setPattern(m_disabledPattern);
+  }
+
   public void startCrowdMeter(Alliance alliance) {
     if (alliance == Alliance.Blue) {
       setPattern(m_blueSoundMeter);

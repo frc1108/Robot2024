@@ -136,8 +136,6 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
     public static final double kPXController = 2;
-    public static final double kDXController = 0;
-
     public static final double kPYController = 2;
     public static final double kPThetaController = 1;
 
@@ -229,12 +227,35 @@ public final class Constants {
     public static final int kRightLauncherMotorCanId = 42;
     public static final int kLeftFeederMotorCanId = 43;
     public static final int kRightFeederMotorCanId = 44;
+
     public static final double kFeederGearRatio = 47/11;
     public static final double kIntakeLauncherSpeed = 0.2;
     public static final double kIntakeFeederSpeed = 0.45;
+    public static double kLauncherIdleRpm = 1000;
+    public static double kMaxLauncherRpm = 4000;
+
+    public static double kLauncherP = 0.00025;
+    public static double kLauncherI = 0.0;
+    public static double kLauncherD = 0.00001;
+    public static double kLauncherFF = 0.0001505;
+    public static double kLauncherOutputMin = -1;
+    public static double kLauncherOutputMax = 1;
+
+    public static double kFeederBackSpeed = 1; // Feeder --> EXIT
+    public static double kFeederFrontSpeed = -0.55; // Feeder --> Launcher
+    public static double kLauncherFrontSpeed = 0.75; // Launcher --> EXIT
+    public static double kLauncherBackSpeed = -0.75; // Launcher --> Feeder
+    
+    public static double kLauncherIntakeNoteSpeed = -0.75; // Launcher --> Feeder
+    public static double kLauncherShootNoteBackSpeed = -0.75; // Launcher --> Feeder
+    public static double kLauncherCenteringSpeed = 0.1; // Launcher --> EXIT
+    
+
+
+
   }
 
-  public static final class VisionConstants {
+  public static final class TagVisionConstants {
         public static final String kCameraName = "Tag Camera OV9281";
         public static final Transform3d kCameraOffset = new Transform3d(
             new Translation3d(
@@ -245,6 +266,20 @@ public final class Constants {
                 0.0,
                 Rotation2d.fromDegrees(25.0).getRadians(),
                 Rotation2d.fromDegrees(170).getRadians()
+            ));
+    }
+
+  public static final class NoteVisionConstants {
+        public static final String kCameraName = "Note Camera OV9782";
+        public static final Transform3d kCameraOffset = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(1.0),
+                Units.inchesToMeters(-11.5),
+                Units.inchesToMeters(24.50)),
+            new Rotation3d(
+                0.0,
+                Rotation2d.fromDegrees(25.0).getRadians(),
+                Rotation2d.fromDegrees(10).getRadians()
             ));
     }
 }

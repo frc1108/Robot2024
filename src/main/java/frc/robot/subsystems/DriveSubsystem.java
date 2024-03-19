@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,8 +16,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import org.photonvision.PhotonUtils;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -26,9 +31,12 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
+import monologue.LogLevel;
+import monologue.Logged;
+import monologue.Annotations.Log;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystem extends SubsystemBase implements Logged {
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -63,7 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
   // Odometry class for tracking robot pose
-  SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
+  private SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(-m_gyro.getAngle()),
       new SwerveModulePosition[] {
@@ -74,7 +82,7 @@ public class DriveSubsystem extends SubsystemBase {
       },
       new Pose2d());
 
-
+  @Log.NT(key = "Field") private final Field2d m_field = new Field2d();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -84,7 +92,7 @@ public class DriveSubsystem extends SubsystemBase {
       this::getRobotRelativeSpeeds,
       this::driveRobotRelative,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(AutoConstants.kPXController,0,AutoConstants.kDXController),
+        new PIDConstants(AutoConstants.kPXController,0,0),
         new PIDConstants(AutoConstants.kPThetaController,0,0),
         DriveConstants.kMaxSpeedMetersPerSecond - 0.3, // max speed in m/s
         Math.sqrt(Math.pow(DriveConstants.kTrackWidth, 2)+Math.pow(DriveConstants.kWheelBase,2))/2, // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
@@ -102,6 +110,8 @@ public class DriveSubsystem extends SubsystemBase {
       }, // should flip path boolean supplier
       this
     );
+
+    //m_odometry.setVisionMeasurementStdDevs(null);
   }
 
   @Override
@@ -115,6 +125,8 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    m_field.setRobotPose(m_odometry.getEstimatedPosition());
 
     SmartDashboard.putNumber("gyro angle", m_gyro.getAngle());
     SmartDashboard.putNumber("pose angle", m_odometry.getEstimatedPosition().getRotation().getDegrees());
@@ -133,8 +145,14 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The pose.
    */
+  @Log.NT(key = "Robot pose")
   public Pose2d getPose() {
     return m_odometry.getEstimatedPosition();
+  }
+
+  @Log.NT(key = "Speaker distance meters")
+  public double getDistanceToSpeakerMeters() {
+    return PhotonUtils.getDistanceToPose(getPose(), getPose());
   }
 
   /**
@@ -242,6 +260,7 @@ public class DriveSubsystem extends SubsystemBase {
     this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
   }
   
+  @Log.NT(key = "Chassis Speed")
   public ChassisSpeeds getRobotRelativeSpeeds(){
     return DriveConstants.kDriveKinematics.toChassisSpeeds(m_frontLeft.getState(),
                                                            m_frontRight.getState(),
@@ -273,7 +292,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
-  /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
     m_rearLeft.resetEncoders();
@@ -281,16 +299,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.resetEncoders();
   }
 
-  /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
   }
 
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
+  @Log.NT(key = "Heading, deg")
   public double getHeading() {
     return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
   }
