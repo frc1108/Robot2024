@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
@@ -38,6 +39,8 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
     ArmConstants.kSVolts, ArmConstants.kGVolts, 
     ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
   private double m_goal = ArmConstants.kArmOffsetRads;
+
+  private boolean m_climbEnabled = false;
   
   public Arm() {
     super(
@@ -60,12 +63,20 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
   m_encoder.setVelocityConversionFactor(ArmConstants.kArmEncoderVelocityFactor);
   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 
-  m_pid.setP(ArmConstants.kP);
-  m_pid.setI(ArmConstants.kI);
-  m_pid.setD(ArmConstants.kD);
-  m_pid.setFF(ArmConstants.kFF);
+  m_pid.setP(ArmConstants.kP,ArmConstants.kSlotDefault);
+  m_pid.setI(ArmConstants.kI,ArmConstants.kSlotDefault);
+  m_pid.setD(ArmConstants.kD,ArmConstants.kSlotDefault);
+  m_pid.setFF(ArmConstants.kFF,ArmConstants.kSlotDefault);
   m_pid.setOutputRange(ArmConstants.kMinOutput,
-        ArmConstants.kMaxOutput);
+        ArmConstants.kMaxOutput,ArmConstants.kSlotDefault);
+
+  // Gain schedule for climbing
+  m_pid.setP(ArmConstants.kPClimb,ArmConstants.kSlotClimb);
+  m_pid.setI(ArmConstants.kIClimb,ArmConstants.kSlotClimb);
+  m_pid.setD(ArmConstants.kDClimb,ArmConstants.kSlotClimb);
+  m_pid.setFF(ArmConstants.kFFClimb,ArmConstants.kSlotClimb);
+  m_pid.setOutputRange(ArmConstants.kMinOutputClimb,
+        ArmConstants.kMaxOutputClimb,ArmConstants.kSlotClimb);
 
   // Apply current limit and idle mode
   m_leftMotor.setIdleMode(IdleMode.kBrake);
@@ -96,8 +107,13 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
 
   
   // Add the feedforward to the PID output to get the motor output
-  m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
-                     ControlType.kPosition, 0, feedforward);
+    if (!m_climbEnabled) {
+      m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
+                      ControlType.kPosition, ArmConstants.kSlotDefault, feedforward);
+    } else {
+      m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
+                    ControlType.kPosition, ArmConstants.kSlotClimb, feedforward);
+    }
   }
 
   public Command setArmGoalCommand(double goal) {
@@ -131,13 +147,21 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
     m_encoder.setPosition(position);
   }
 
-  @Log.NT(key = "Motor current")
+  @Log.NT(key = "Arm, Amps")
   public double getMotorCurrent(){
     return m_leftMotor.getOutputCurrent();
   }
 
   public void setIdle(IdleMode mode) {
     m_leftMotor.setIdleMode(mode);
+  }
+
+  public void enableClimb() {
+    m_climbEnabled = true;
+  }
+
+  public void disableClimb() {
+    m_climbEnabled = true;
   }
 }
   

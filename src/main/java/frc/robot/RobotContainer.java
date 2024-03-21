@@ -120,7 +120,7 @@ public class RobotContainer implements Logged{
     // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
     //                                                       Commands.waitSeconds(6),
     //                                                       Commands.runOnce(()->m_arm.setIdle(IdleMode.kCoast))));
-                                                          
+    m_operatorController.axisGreaterThan(0, 0.5).debounce(0.2).onTrue(Commands.print("Axis Trigger"));                                                      
     //**** DRIVER CONTROLS ****/
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));

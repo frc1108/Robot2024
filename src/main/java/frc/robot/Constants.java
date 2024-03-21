@@ -192,7 +192,7 @@ public final class Constants {
     public static final double kArmEncoderPositionPIDMinInput = kArmOffsetRads; // radians
     public static final double kArmEncoderPositionPIDMaxInput = kArmMaxRads; 
 
-    public static final int kArmMotorCurrentLimit = 40; // amps
+    public static final int kArmMotorCurrentLimit = 50; // amps
     
     public static final double kP = 4; //10000x
     public static final double kI = 0;
@@ -201,9 +201,18 @@ public final class Constants {
     public static final double kFF = 0;
     public static final double kMinOutput = -1;
     public static final double kMaxOutput = 1;
-    public static final double kMaxPositionErrorRad = 0.7854;
-    public static final double kMaxVelocityErrorRadPerSec = 1.8656;
-    public static final double kControlEffortVolts = 7;
+    // public static final double kMaxPositionErrorRad = 0.7854;
+    // public static final double kMaxVelocityErrorRadPerSec = 1.8656;
+    // public static final double kControlEffortVolts = 7;
+    public static final int kSlotDefault = 0;
+    public static final int kSlotClimb = 1;
+
+    public static final double kPClimb = 4; //10000x
+    public static final double kIClimb = 0;
+    public static final double kDClimb = 0.5;
+    public static final double kFFClimb = 0;
+    public static final double kMinOutputClimb = -1;
+    public static final double kMaxOutputClimb = 1;
 
     public static final double kMaxArmSpeedRpm = 
       NeoMotorConstants.kFreeSpeedRpm / kArmGearRatio ;
@@ -215,11 +224,11 @@ public final class Constants {
     public static final double kArmDeadband = 0.1;
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
-    public static final double kArmShootingAngleRads = Units.degreesToRadians(62.5);
-    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(45);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-36); //38
+    public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5);
+    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-38); //38
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-44+12);
+    public static final double kArmDownRads = Units.degreesToRadians(-20);
   }
     
   public static final class HendersonConstants {
