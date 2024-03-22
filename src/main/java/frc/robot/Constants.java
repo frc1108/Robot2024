@@ -228,7 +228,9 @@ public final class Constants {
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
     public static final double kArmPickupAngleRads = Units.degreesToRadians(-38); //38
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-32);
+    public static final double kArmDownRads = Units.degreesToRadians(-32); //20
+    public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 5; //20
+
   }
     
   public static final class HendersonConstants {

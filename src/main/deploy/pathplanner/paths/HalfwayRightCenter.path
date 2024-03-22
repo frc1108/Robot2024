@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.788533031611517,
-        "y": 1.4982277691828116
+        "x": 7.439998152723578,
+        "y": 1.903064169764704
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.7886023044773361,
-        "y": 4.459140554644746
+        "x": 6.628397256794513,
+        "y": 4.160620684877734
       },
       "prevControl": {
-        "x": 1.5921617752326411,
-        "y": 2.863736809291801
+        "x": 6.861615905049991,
+        "y": 3.3676772808091076
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
   "eventMarkers": [
     {
       "name": "CenterBeforeSW",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -54,36 +54,6 @@
               "type": "named",
               "data": {
                 "name": "CenteringNote"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.95,
-      "command": {
-        "type": "race",
-        "data": {
-          "commands": [
-            {
-              "type": "sequential",
-              "data": {
-                "commands": [
-                  {
-                    "type": "named",
-                    "data": {
-                      "name": "ShootBackwards"
-                    }
-                  },
-                  {
-                    "type": "wait",
-                    "data": {
-                      "waitTime": 0.2
-                    }
-                  }
-                ]
               }
             }
           ]
@@ -99,7 +69,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -60.0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,

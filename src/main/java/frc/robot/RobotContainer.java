@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 import java.io.IOException;
@@ -123,6 +124,7 @@ public class RobotContainer implements Logged{
     //**** TRIGGERS ****/
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
+    new Trigger(m_feeder::getBeamBreak).onTrue(Commands.runOnce(()->m_led.flash())
     // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
     //                                                       Commands.waitSeconds(6),
     //                                                       Commands.runOnce(()->m_arm.setIdle(IdleMode.kCoast))));
@@ -171,6 +173,15 @@ public class RobotContainer implements Logged{
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
     m_operatorController.povRight().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads));
     m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
+
+    m_operatorController.axisGreaterThan(5,-0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+1*ArmConstants.kArmShootingStepsRads));
+    m_operatorController.axisGreaterThan(4,0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+2*ArmConstants.kArmShootingStepsRads));
+    m_operatorController.axisGreaterThan(5,0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+3*ArmConstants.kArmShootingStepsRads));
+    m_operatorController.axisGreaterThan(4,-0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+4*ArmConstants.kArmShootingStepsRads));
       }
 
   /**

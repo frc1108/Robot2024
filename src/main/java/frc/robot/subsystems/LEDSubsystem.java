@@ -102,6 +102,10 @@ public class LEDSubsystem extends SubsystemBase {
     setPattern(m_yellowPattern);
   }
 
+  public void hasNote() {
+    setPattern(m_yellowPattern);
+  }
+
   public void rainbow() {
     setPattern(m_disabledPattern);
   }
