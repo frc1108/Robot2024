@@ -40,7 +40,7 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
     ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
   private double m_goal = ArmConstants.kArmOffsetRads;
 
-  private boolean m_climbEnabled = false;
+  @Log.NT(key = "Climb Enabled") private boolean m_climbEnabled = false;
   
   public Arm() {
     super(

@@ -207,7 +207,7 @@ public final class Constants {
     public static final int kSlotDefault = 0;
     public static final int kSlotClimb = 1;
 
-    public static final double kPClimb = 4; //10000x
+    public static final double kPClimb = 8; //10000x
     public static final double kIClimb = 0;
     public static final double kDClimb = 0.5;
     public static final double kFFClimb = 0;
@@ -228,7 +228,7 @@ public final class Constants {
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
     public static final double kArmPickupAngleRads = Units.degreesToRadians(-38); //38
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-20);
+    public static final double kArmDownRads = Units.degreesToRadians(-32);
   }
     
   public static final class HendersonConstants {

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,6 +17,7 @@ import frc.robot.Constants.HendersonConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.UnderrollerConstants;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Brake;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Underroller;
@@ -55,7 +57,9 @@ public class RobotContainer implements Logged{
   private final HendersonFeeder m_feeder = new HendersonFeeder();
   private final HendersonLauncher m_launcher  = new HendersonLauncher();
   private final LEDSubsystem m_led = new LEDSubsystem();
+  private final Brake m_brake = new Brake();
   private Vision m_vision;
+
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -117,14 +121,26 @@ public class RobotContainer implements Logged{
    */
   private void configureButtonBindings() {
     //**** TRIGGERS ****/
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
     // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
     //                                                       Commands.waitSeconds(6),
     //                                                       Commands.runOnce(()->m_arm.setIdle(IdleMode.kCoast))));
     m_operatorController.axisGreaterThan(0, 0.5).debounce(0.2).onTrue(Commands.print("Axis Trigger"));                                                      
     //**** DRIVER CONTROLS ****/
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
+    m_driverController.x().onTrue(Commands.runOnce(() -> m_vision.enableVision()));
+    m_driverController.y().onTrue(Commands.runOnce(() -> m_vision.disableVision())
+                                  .andThen(Commands.sequence(
+                                    Commands.runOnce(()->m_robotDrive.zeroHeading()),
+                                    Commands.runOnce(()->m_robotDrive.resetOdometry(new Pose2d())
+                                  ))));
+                                  //.andThen(Commands.runOnce(()->m_robotDrive.resetOdometry(m_robotDrive.getPose()))));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
     m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
+    m_operatorController.back().onTrue(m_brake.brake());
+    m_driverController.back().onTrue(m_brake.unbrake());
+
 
     //**** OPERATOR CONTROLS ****
     m_operatorController.a().whileTrue(Commands.runEnd(
@@ -140,8 +156,13 @@ public class RobotContainer implements Logged{
                                          ()->m_launcher.set(HendersonConstants.kLauncherBackSpeed),
                                          ()->m_launcher.set(0),m_launcher));
     
-    m_operatorController.start().onTrue(shoot());
-    m_operatorController.back().onTrue(intakeNote());
+    m_operatorController.axisGreaterThan(0,0.75).onTrue(shoot());
+    m_operatorController.axisLessThan(0,-0.75).onTrue(shootBackwards());
+    m_operatorController.axisGreaterThan(1,0.75).onTrue(intakeNote());
+    m_operatorController.axisLessThan(1,-0.75).onTrue(centeringNote());
+
+    m_operatorController.start().onTrue(Commands.runOnce(()->m_arm.enableClimb()));
+    m_operatorController.back().onTrue(Commands.runOnce(()->m_arm.disableClimb()));
     
     m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
     m_operatorController.rightBumper().whileTrue(m_underroller.reverseUnderroller().withName("Outtaking"));
@@ -170,7 +191,7 @@ public class RobotContainer implements Logged{
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
-    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:1;
+    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:-1; //TODO Fix the invert problem
   }
    
   public Command intakeNote() {
@@ -264,5 +285,10 @@ public class RobotContainer implements Logged{
       // Do whatever you want with the poses here
       m_path.getObject("path").setPoses(poses);
     });
+  }
+  
+  @Log.NT(key = "Vision Enabled") 
+  public boolean getVisionEnabled(){
+    return m_vision.getVisionEnabled();
   }
 }
