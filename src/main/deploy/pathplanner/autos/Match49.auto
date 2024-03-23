@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.75,
-      "y": 4.35
+      "x": 1.25,
+      "y": 3.5
     },
     "rotation": -60.0
   },
@@ -15,6 +15,18 @@
           "type": "named",
           "data": {
             "name": "CenteringNote"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Match49"
           }
         },
         {
@@ -62,9 +74,21 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "RightCenterToRightSW"
+            "pathName": "HalfwayRightCenter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootBackwards"
           }
         }
       ]

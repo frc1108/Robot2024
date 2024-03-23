@@ -124,7 +124,7 @@ public class RobotContainer implements Logged{
     //**** TRIGGERS ****/
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
-    new Trigger(m_feeder::getBeamBreak).onTrue(Commands.runOnce(()->m_led.flash())
+    //new Trigger(m_feeder::getBeamBreak).onTrue(Commands.runOnce(()->m_led.flash())
     // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
     //                                                       Commands.waitSeconds(6),
     //                                                       Commands.runOnce(()->m_arm.setIdle(IdleMode.kCoast))));
@@ -179,9 +179,9 @@ public class RobotContainer implements Logged{
     m_operatorController.axisGreaterThan(4,0.75).onTrue(
       m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+2*ArmConstants.kArmShootingStepsRads));
     m_operatorController.axisGreaterThan(5,0.75).onTrue(
-      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+3*ArmConstants.kArmShootingStepsRads));
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+1*ArmConstants.kArmPickupStepsRads));
     m_operatorController.axisGreaterThan(4,-0.75).onTrue(
-      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+4*ArmConstants.kArmShootingStepsRads));
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+2*ArmConstants.kArmPickupStepsRads));
       }
 
   /**

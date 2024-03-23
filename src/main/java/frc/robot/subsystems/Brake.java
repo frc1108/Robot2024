@@ -28,11 +28,11 @@ public class Brake extends SubsystemBase {
   }
 
   public Command brake() {
-    return Commands.startEnd(()->set(0.5),()->set(0),this).withTimeout(0.3);
+    return Commands.startEnd(()->set(0.75),()->set(0),this).withTimeout(0.3);
   }
 
   public Command unbrake() {
-    return Commands.startEnd(()->set(-0.5),()->set(0),this).withTimeout(0.3);
+    return Commands.startEnd(()->set(-0.75),()->set(0),this).withTimeout(0.3);
   }
 
   @Override

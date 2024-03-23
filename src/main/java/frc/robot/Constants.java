@@ -31,11 +31,11 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxSpeedMetersPerSecond = 5.75;
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
-    public static final double kDirectionSlewRate = 1.2; // radians per second
-    public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
+    public static final double kDirectionSlewRate = 1.8; // radians per second 1.2
+    public static final double kMagnitudeSlewRate = 3.0; // percent per second (1 = 100%) 1.8
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
@@ -98,9 +98,13 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
     // Recalc values for arbfeedForward
-    // public static final double kDrivingkS = 0.0; 
+    // public static final double kDrivingkS = 0.08; 
     // public static final double kDrivingkV = 2.09; //2.11
     // public static final double kDrivingkA = 0.39; //0.39
+    // public static final double kDrivingP = 0.2; //0.04
+    // public static final double kDrivingI = 0;
+    // public static final double kDrivingD = 0;
+    // public static final double kDrivingFF = 0;
 
     public static final double kDrivingP = 0.04; //0.04
     public static final double kDrivingI = 0;
@@ -138,6 +142,9 @@ public final class Constants {
     public static final double kPXController = 2;
     public static final double kPYController = 2;
     public static final double kPThetaController = 1;
+    // public static final double kPXController = 5;
+    // public static final double kPYController = 5;
+    // public static final double kPThetaController = 5;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
@@ -226,10 +233,11 @@ public final class Constants {
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
     public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5);
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-38); //38
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-39); //38
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-32); //20
-    public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 5; //20
+    public static final double kArmDownRads = Units.degreesToRadians(-42); //20
+    public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
+    public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
 
   }
     
