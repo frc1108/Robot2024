@@ -31,11 +31,11 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 5.75;
+    public static final double kMaxSpeedMetersPerSecond = 5.5;
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
-    public static final double kDirectionSlewRate = 1.8; // radians per second 1.2
-    public static final double kMagnitudeSlewRate = 3.0; // percent per second (1 = 100%) 1.8
+    public static final double kDirectionSlewRate = 1.5; // radians per second 1.2
+    public static final double kMagnitudeSlewRate = 2.0; // percent per second (1 = 100%) 1.8
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
@@ -233,9 +233,9 @@ public final class Constants {
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
     public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5);
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-39); //38
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-42); //20
+    public static final double kArmDownRads = Units.degreesToRadians(-40); //20
     public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
     public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
 

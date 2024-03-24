@@ -182,6 +182,8 @@ public class RobotContainer implements Logged{
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+1*ArmConstants.kArmPickupStepsRads));
     m_operatorController.axisGreaterThan(4,-0.75).onTrue(
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+2*ArmConstants.kArmPickupStepsRads));
+
+    m_driverController.axisGreaterThan(3, 0.75).onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
       }
 
   /**

@@ -78,18 +78,6 @@
           "data": {
             "waitTime": 0.1
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "HalfwayRightCenter"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
-          }
         }
       ]
     }
