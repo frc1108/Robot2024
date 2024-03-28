@@ -32,9 +32,9 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "path",
                       "data": {
-                        "name": "RightSWToRingC"
+                        "pathName": "RightSWToRingC"
                       }
                     },
                     {
