@@ -217,16 +217,19 @@ public class RobotContainer implements Logged{
           Commands.runOnce(()->m_feeder.set(HendersonConstants.kIntakeFeederSpeed),m_feeder),
           Commands.runOnce(()->m_underroller.setUnderrollerspeed(UnderrollerConstants.kUnderrollerIntakeSpeed),m_underroller),
           Commands.runOnce(()->m_led.yellow()),
-          Commands.runOnce(()->m_feeder.enableLimitSwitches())),
-        Commands.race(Commands.waitUntil(()->m_feeder.getBeamBreak()),Commands.waitSeconds(5)),
+          Commands.runOnce(()->m_feeder.enableLimitSwitches())
+        ),
+        Commands.race(Commands.waitUntil(()->m_feeder.getBeamBreak()),Commands.waitSeconds(5))
+        .finallyDo(()->
           Commands.parallel(
-          Commands.runOnce(()->m_launcher.set(0),m_launcher),
-          Commands.runOnce(()->m_feeder.set(0),m_feeder),
-          Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller),
-          Commands.runOnce(()->m_feeder.disableLimitSwitches())),
-        Commands.waitSeconds(0.5),
-        Commands.runOnce(()->m_led.off())
-        );
+            Commands.runOnce(()->m_launcher.set(0),m_launcher),
+            Commands.runOnce(()->m_feeder.set(0),m_feeder),
+            Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller),
+            Commands.runOnce(()->m_feeder.disableLimitSwitches()),
+            Commands.runOnce(()->m_led.off())
+          )
+        )
+      );
   }
 
   public Command shoot() {
@@ -250,23 +253,21 @@ public class RobotContainer implements Logged{
       Commands.runOnce(()->m_feeder.set(1)),
       Commands.waitSeconds(0.25),
       Commands.runOnce(()->m_launcher.set(0.8)),
-      Commands.waitSeconds(0.75)).andThen(
+      Commands.waitSeconds(0.75)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),
-                        Commands.runOnce(()->m_feeder.set(0.0)))
-                          );
+                        Commands.runOnce(()->m_feeder.set(0.0)),
+                        Commands.runOnce(()->m_feeder.enableLimitSwitches())));
   }
 
   public Command centeringNote() {
     return Commands.sequence(
-      Commands.runOnce(()->m_feeder.disableLimitSwitches()),
       Commands.parallel(Commands.runOnce(()->m_launcher.set(-0.1)),
                         Commands.runOnce(()->m_feeder.set(-0.5))),
-      Commands.waitSeconds(0.1)).andThen(
+       Commands.waitSeconds(0.1)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),
-                        Commands.runOnce(()->m_feeder.set(0.0)))
-                          );
+                        Commands.runOnce(()->m_feeder.set(0.0))));
   }
 
   public void setupMonologue() {
