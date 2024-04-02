@@ -57,6 +57,9 @@ public class HendersonFeeder extends SubsystemBase implements Logged {
 
   public void disableLimitSwitches(){
     m_limitSwitch.enableLimitSwitch(false);
+    if (m_limitSwitch.isLimitSwitchEnabled()) {
+          m_limitSwitch.enableLimitSwitch(false);
+    }
   }
 
   // public Command run(){

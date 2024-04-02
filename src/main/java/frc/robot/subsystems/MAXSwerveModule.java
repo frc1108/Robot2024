@@ -19,8 +19,10 @@ import com.revrobotics.RelativeEncoder;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class MAXSwerveModule {
+public class MAXSwerveModule implements Logged {
   private final CANSparkFlex m_drivingSparkMax;
   private final CANSparkMax m_turningSparkMax;
 
@@ -33,14 +35,21 @@ public class MAXSwerveModule {
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
-  //private SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(ModuleConstants.kDrivingkS, ModuleConstants.kDrivingkV, ModuleConstants.kDrivingkA);
+  private SimpleMotorFeedforward m_feedforward;
+  private double m_kS, m_kA, m_kV;
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
    * encoder, and PID controller. This configuration is specific to the REV
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset,
+                         double kS, double kV, double kA) {
+    m_kS = kS;
+    m_kV = kV;
+    m_kA = kA;
+    m_feedforward = new SimpleMotorFeedforward(m_kS,m_kV,m_kA);
+    
     m_drivingSparkMax = new CANSparkFlex(drivingCANId, MotorType.kBrushless);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -63,7 +72,7 @@ public class MAXSwerveModule {
     m_drivingEncoder.setPositionConversionFactor(ModuleConstants.kDrivingEncoderPositionFactor);
     m_drivingEncoder.setVelocityConversionFactor(ModuleConstants.kDrivingEncoderVelocityFactor);
     m_drivingEncoder.setAverageDepth(2);
-    m_drivingEncoder.setMeasurementPeriod(16);
+    m_drivingEncoder.setMeasurementPeriod(8);
 
     // Apply position and velocity conversion factors for the turning encoder. We
     // want these in radians and radians per second to use with WPILib's swerve
@@ -121,6 +130,7 @@ public class MAXSwerveModule {
    *
    * @return The current state of the module.
    */
+  @Log.NT(key="Swerve State")
   public SwerveModuleState getState() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
@@ -157,19 +167,20 @@ public class MAXSwerveModule {
         new Rotation2d(m_turningEncoder.getPosition()));
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
-    // var sign = Math.signum(optimizedDesiredState.speedMetersPerSecond);
-    // m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, 
-    //                                     CANSparkMax.ControlType.kVelocity,
-    //                                     0,
-    //                                     m_feedforward.calculate(
-    //                                       sign*m_desiredState.speedMetersPerSecond,
-    //                                       sign*desiredState.speedMetersPerSecond,
-    //                                       0.02)
-    //                                     );
-    m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+    var sign = Math.signum(optimizedDesiredState.speedMetersPerSecond);
+    m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, 
+                                        CANSparkMax.ControlType.kVelocity,
+                                        0,
+                                        m_feedforward.calculate(
+                                          sign*m_desiredState.speedMetersPerSecond,
+                                          sign*desiredState.speedMetersPerSecond,
+                                          0.02)
+                                        );
+    //m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 
     m_desiredState = desiredState;
+    this.log("Desired State",m_desiredState);
   }
 
   /** Zeroes all the SwerveModule encoders. */

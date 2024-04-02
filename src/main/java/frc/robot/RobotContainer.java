@@ -122,8 +122,9 @@ public class RobotContainer implements Logged{
    */
   private void configureButtonBindings() {
     //**** TRIGGERS ****/
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
+    //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
     //new Trigger(m_feeder::getBeamBreak).onTrue(Commands.runOnce(()->m_led.flash())
     // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
     //                                                       Commands.waitSeconds(6),
@@ -131,12 +132,11 @@ public class RobotContainer implements Logged{
     m_operatorController.axisGreaterThan(0, 0.5).debounce(0.2).onTrue(Commands.print("Axis Trigger"));                                                      
     //**** DRIVER CONTROLS ****/
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
-    m_driverController.x().onTrue(Commands.runOnce(() -> m_vision.enableVision()));
-    m_driverController.y().onTrue(Commands.runOnce(() -> m_vision.disableVision())
-                                  .andThen(Commands.sequence(
-                                    Commands.runOnce(()->m_robotDrive.zeroHeading()),
-                                    Commands.runOnce(()->m_robotDrive.resetOdometry(new Pose2d())
-                                  ))));
+    m_driverController.x().onTrue(Commands.runOnce(() -> m_robotDrive.startVisionPose()));
+    m_driverController.y().onTrue(Commands.parallel(
+                                    Commands.runOnce(() -> m_robotDrive.stopVisionPose()),
+                                    Commands.runOnce(()->m_robotDrive.zeroHeading())
+                                  ));
                                   //.andThen(Commands.runOnce(()->m_robotDrive.resetOdometry(m_robotDrive.getPose()))));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
     m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
@@ -301,8 +301,4 @@ public class RobotContainer implements Logged{
     });
   }
   
-  @Log.NT(key = "Vision Enabled") 
-  public boolean getVisionEnabled(){
-    return m_vision.getVisionEnabled();
-  }
 }

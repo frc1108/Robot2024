@@ -18,13 +18,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import monologue.Logged;
-import monologue.Annotations.Log;
 
 public class Vision extends SubsystemBase implements Logged {
     private final PhotonCamera photonCamera;    
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> consumer;
-    private boolean isEnabled = true;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) throws IOException{
         photonCamera = new PhotonCamera(Constants.TagVisionConstants.kCameraName);
@@ -37,45 +35,33 @@ public class Vision extends SubsystemBase implements Logged {
 
     @Override
     public void periodic(){
-        if (isEnabled) {
-            boolean connected = photonCamera.isConnected();
-            if (!connected)
-                return;
+      boolean connected = photonCamera.isConnected();
+      if (!connected)
+          return;
 
-            PhotonPipelineResult pipelineResult = photonCamera.getLatestResult();
-            boolean hasTargets = pipelineResult.hasTargets();
-            if (!hasTargets)
-                return;
+        PhotonPipelineResult pipelineResult = photonCamera.getLatestResult();
+        boolean hasTargets = pipelineResult.hasTargets();
+        if (!hasTargets)
+            return;
 
-            List<PhotonTrackedTarget> badTargets = new ArrayList<>();
-            for(PhotonTrackedTarget target : pipelineResult.targets){
-                if(target.getPoseAmbiguity()>0.5){
-                    badTargets.add(target);
-                }
+        List<PhotonTrackedTarget> badTargets = new ArrayList<>();
+        for(PhotonTrackedTarget target : pipelineResult.targets){
+            if(target.getPoseAmbiguity()>0.35){  // Changed from 0.5 ambiguity
+                badTargets.add(target);
             }
-
-            pipelineResult.targets.removeAll(badTargets);
-            
-            Optional<EstimatedRobotPose> poseResult = poseEstimator.update(pipelineResult);
-            boolean posePresent = poseResult.isPresent();
-            if (!posePresent)
-                return;
-
-            EstimatedRobotPose estimatedPose = poseResult.get();
-
-            consumer.accept(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
         }
+
+        pipelineResult.targets.removeAll(badTargets);
+        
+        Optional<EstimatedRobotPose> poseResult = poseEstimator.update(pipelineResult);
+        boolean posePresent = poseResult.isPresent();
+        if (!posePresent)
+            return;
+
+        EstimatedRobotPose estimatedPose = poseResult.get();
+
+        consumer.accept(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
     }
 
-    public void disableVision() {
-        isEnabled = false;
-    }
 
-    public void enableVision() {
-        isEnabled = true;
-    }
-
-    public boolean getVisionEnabled() {
-        return isEnabled;
-    }
 }

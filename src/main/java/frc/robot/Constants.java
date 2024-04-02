@@ -31,7 +31,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 5.5;
+    public static final double kMaxSpeedMetersPerSecond = 5.76;
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.5; // radians per second 1.2
@@ -65,6 +65,23 @@ public final class Constants {
     public static final int kRearLeftTurningCanId = 12;
     public static final int kFrontRightTurningCanId = 14;
     public static final int kRearRightTurningCanId = 16;
+
+    // Drive Module constants
+    public static final double kFrontLeftDrivingkS = 0.17; //0.125
+    public static final double kFrontLeftDrivingkV = 2.5; //2.21
+    public static final double kFrontLeftDrivingkA = 0.4; //0.37
+
+    public static final double kFrontRightDrivingkS = 0.1; //0.125
+    public static final double kFrontRightDrivingkV = 2.15; //2.21
+    public static final double kFrontRightDrivingkA = 0.37; //0.37
+
+    public static final double kRearLeftDrivingkS = 0.125;
+    public static final double kRearLeftDrivingkV = 2.21;
+    public static final double kRearLeftDrivingkA = 0.37;
+
+    public static final double kRearRightDrivingkS = 0.125;
+    public static final double kRearRightDrivingkV = 2.21;
+    public static final double kRearRightDrivingkA = 0.37;
   }
 
   public static final class ModuleConstants {
@@ -79,7 +96,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = VortexMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.0762; //0.07526; // 0.0762
+    public static final double kWheelDiameterMeters = 0.072; // 0.0762 (Caliper and squeeze 3/28 3D printed -- Max 0.0753)
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -98,18 +115,22 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
     // Recalc values for arbfeedForward
-    // public static final double kDrivingkS = 0.08; 
-    // public static final double kDrivingkV = 2.09; //2.11
-    // public static final double kDrivingkA = 0.39; //0.39
-    // public static final double kDrivingP = 0.2; //0.04
+    public static final double kDrivingkS = 0.125; //0.08 //0.175
+    public static final double kDrivingkV = 2.5; //Must be greater than zero 2.21
+    public static final double kDrivingkA = 0.4; //Must be greater than zero 0.37
+
+    // public static final double kDrivingP = 0.04; //0.04
     // public static final double kDrivingI = 0;
     // public static final double kDrivingD = 0;
-    // public static final double kDrivingFF = 0;
+    // public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+    // public static final double kDrivingMinOutput = -1;
+    // public static final double kDrivingMaxOutput = 1;
 
-    public static final double kDrivingP = 0.04; //0.04
+    // TEST Values turnoff PID
+    public static final double kDrivingP = 0.05; 
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
-    public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+    public static final double kDrivingFF = 0;
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
@@ -242,10 +263,10 @@ public final class Constants {
   }
     
   public static final class HendersonConstants {
-    public static final int kLeftLauncherMotorCanId = 41;
-    public static final int kRightLauncherMotorCanId = 42;
-    public static final int kLeftFeederMotorCanId = 43;
-    public static final int kRightFeederMotorCanId = 44;
+    public static final int kLeftLauncherMotorCanId = 1;
+    public static final int kRightLauncherMotorCanId = 2;
+    public static final int kLeftFeederMotorCanId = 3;
+    public static final int kRightFeederMotorCanId = 4;
 
     public static final double kFeederGearRatio = 47/11;
     public static final double kIntakeLauncherSpeed = 0.2;
