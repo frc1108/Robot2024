@@ -256,7 +256,7 @@ public final class Constants {
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
     public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-40); //20
+    public static final double kArmDownRads = Units.degreesToRadians(-39); //20
     public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
     public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
 

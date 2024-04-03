@@ -252,7 +252,7 @@ public class RobotContainer implements Logged{
       Commands.waitSeconds(0.2),
       Commands.runOnce(()->m_feeder.set(1)),
       Commands.waitSeconds(0.25),
-      Commands.runOnce(()->m_launcher.set(0.8)),
+      Commands.runOnce(()->m_launcher.set(1)),
       Commands.waitSeconds(0.75)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),
@@ -262,9 +262,9 @@ public class RobotContainer implements Logged{
 
   public Command centeringNote() {
     return Commands.sequence(
-      Commands.parallel(Commands.runOnce(()->m_launcher.set(-0.1)),
+      Commands.parallel(Commands.runOnce(()->m_launcher.set(0.1)),
                         Commands.runOnce(()->m_feeder.set(-0.5))),
-       Commands.waitSeconds(0.1)).finallyDo(()->
+       Commands.waitSeconds(0.05)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),
                         Commands.runOnce(()->m_feeder.set(0.0))));
