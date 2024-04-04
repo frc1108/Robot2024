@@ -196,6 +196,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
   public void visionPose(Pose2d pose,double timestamp){
     if (isVisionAdded) {
       m_odometry.addVisionMeasurement(pose, timestamp);
+      this.log("Vision target added",pose);
     }
   }
 
