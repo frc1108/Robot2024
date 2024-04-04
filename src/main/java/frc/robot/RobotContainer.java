@@ -252,7 +252,7 @@ public class RobotContainer implements Logged{
       Commands.waitSeconds(0.2),
       Commands.runOnce(()->m_feeder.set(1)),
       Commands.waitSeconds(0.25),
-      Commands.runOnce(()->m_launcher.set(1)),
+      Commands.runOnce(()->m_launcher.set(0.8)),
       Commands.waitSeconds(0.75)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),

@@ -31,7 +31,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 5.76;
+    public static final double kMaxSpeedMetersPerSecond = 5.5;
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.5; // radians per second 1.2
@@ -67,19 +67,19 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 16;
 
     // Drive Module constants
-    public static final double kFrontLeftDrivingkS = 0.17; //0.125
-    public static final double kFrontLeftDrivingkV = 2.5; //2.21
-    public static final double kFrontLeftDrivingkA = 0.4; //0.37
+    public static final double kFrontLeftDrivingkS = 0.05; //0.125
+    public static final double kFrontLeftDrivingkV = 2.21; //2.21
+    public static final double kFrontLeftDrivingkA = 0.37; //0.37
 
-    public static final double kFrontRightDrivingkS = 0.1; //0.125
-    public static final double kFrontRightDrivingkV = 2.15; //2.21
+    public static final double kFrontRightDrivingkS = 0.05; //0.125
+    public static final double kFrontRightDrivingkV = 2.21; //2.21
     public static final double kFrontRightDrivingkA = 0.37; //0.37
 
-    public static final double kRearLeftDrivingkS = 0.125;
+    public static final double kRearLeftDrivingkS = 0.05;
     public static final double kRearLeftDrivingkV = 2.21;
     public static final double kRearLeftDrivingkA = 0.37;
 
-    public static final double kRearRightDrivingkS = 0.125;
+    public static final double kRearRightDrivingkS = 0.05;
     public static final double kRearRightDrivingkV = 2.21;
     public static final double kRearRightDrivingkA = 0.37;
   }
@@ -116,8 +116,8 @@ public final class Constants {
 
     // Recalc values for arbfeedForward
     public static final double kDrivingkS = 0.125; //0.08 //0.175
-    public static final double kDrivingkV = 2.5; //Must be greater than zero 2.21
-    public static final double kDrivingkA = 0.4; //Must be greater than zero 0.37
+    public static final double kDrivingkV = 2.21; //Must be greater than zero 2.21
+    public static final double kDrivingkA = 0.37; //Must be greater than zero 0.37
 
     // public static final double kDrivingP = 0.04; //0.04
     // public static final double kDrivingI = 0;
@@ -127,7 +127,7 @@ public final class Constants {
     // public static final double kDrivingMaxOutput = 1;
 
     // TEST Values turnoff PID
-    public static final double kDrivingP = 0.05; 
+    public static final double kDrivingP = 0.04; 
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
     public static final double kDrivingFF = 0;

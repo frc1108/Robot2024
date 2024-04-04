@@ -168,15 +168,15 @@ public class MAXSwerveModule implements Logged {
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
     var sign = Math.signum(optimizedDesiredState.speedMetersPerSecond);
-    m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, 
-                                        CANSparkMax.ControlType.kVelocity,
-                                        0,
-                                        m_feedforward.calculate(
-                                          sign*m_desiredState.speedMetersPerSecond,
-                                          sign*desiredState.speedMetersPerSecond,
-                                          0.02)
-                                        );
-    //m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+    // m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, 
+    //                                     CANSparkMax.ControlType.kVelocity,
+    //                                     0,
+    //                                     m_feedforward.calculate(
+    //                                       sign*m_desiredState.speedMetersPerSecond,
+    //                                       sign*desiredState.speedMetersPerSecond,
+    //                                       0.02)
+    //                                     );
+    m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 
     m_desiredState = desiredState;
