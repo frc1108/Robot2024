@@ -249,9 +249,9 @@ public class RobotContainer implements Logged{
     return Commands.sequence(
       Commands.runOnce(()->m_feeder.disableLimitSwitches()),
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads-Units.degreesToRadians(2)),
-      Commands.waitSeconds(0.2),
+      Commands.waitSeconds(0.3),
       Commands.runOnce(()->m_feeder.set(1)),
-      Commands.waitSeconds(0.25),
+      Commands.waitSeconds(0.3),
       Commands.runOnce(()->m_launcher.set(0.8)),
       Commands.waitSeconds(0.75)).finallyDo(()->
         Commands.parallel(
