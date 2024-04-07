@@ -125,7 +125,10 @@ public class RobotContainer implements Logged{
     //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
-    //new Trigger(m_feeder::getBeamBreak).onTrue(Commands.runOnce(()->m_led.flash())
+    new Trigger(()->!m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.off()));
+    new Trigger(()->m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.orange()));
+
+
     // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
     //                                                       Commands.waitSeconds(6),
     //                                                       Commands.runOnce(()->m_arm.setIdle(IdleMode.kCoast))));
@@ -142,7 +145,6 @@ public class RobotContainer implements Logged{
     m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
     m_operatorController.back().onTrue(m_brake.brake());
     m_driverController.back().onTrue(m_brake.unbrake());
-
 
     //**** OPERATOR CONTROLS ****
     m_operatorController.a().whileTrue(Commands.runEnd(
@@ -172,6 +174,7 @@ public class RobotContainer implements Logged{
     m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
     m_operatorController.povRight().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads));
+    m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
     m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
 
     m_operatorController.axisGreaterThan(5,-0.75).onTrue(

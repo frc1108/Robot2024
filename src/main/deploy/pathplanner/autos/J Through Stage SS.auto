@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8,
-      "y": 5.066560401457118
+      "x": 0.9127296966579629,
+      "y": 4.420390379242297
     },
-    "rotation": -52.12501634890181
+    "rotation": -51.95295746817389
   },
   "command": {
     "type": "sequential",
@@ -34,13 +34,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "James SSTRC"
+                        "pathName": "J Through Stage SS"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 9.0
                       }
                     }
                   ]
@@ -53,24 +53,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "James RCTSS"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CenteringNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
           }
         }
       ]

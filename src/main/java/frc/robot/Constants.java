@@ -269,8 +269,8 @@ public final class Constants {
     public static final int kRightFeederMotorCanId = 4;
 
     public static final double kFeederGearRatio = 47/11;
-    public static final double kIntakeLauncherSpeed = 0.2;
-    public static final double kIntakeFeederSpeed = 0.45;
+    public static final double kIntakeLauncherSpeed = 0.1;
+    public static final double kIntakeFeederSpeed = 0.3;
     public static double kLauncherIdleRpm = 1000;
     public static double kMaxLauncherRpm = 4000;
 
