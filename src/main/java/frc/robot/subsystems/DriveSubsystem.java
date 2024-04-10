@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -27,11 +28,15 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.NoteVisionConstants;
 import frc.utils.SwerveUtils;
 import monologue.Logged;
 import monologue.Annotations.Log;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase implements Logged {
@@ -94,6 +99,8 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
 
   @Log.NT(key = "Field") private final Field2d m_field = new Field2d();
   @Log.NT(key = "Vision Enabled") private boolean isVisionAdded = true;
+
+  //private final PhotonCamera noteCamera = new PhotonCamera(NoteVisionConstants.kCameraName);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -196,6 +203,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
   public void visionPose(Pose2d pose,double timestamp){
     if (isVisionAdded) {
       m_odometry.addVisionMeasurement(pose, timestamp);
+      this.log("Vision target added",pose);
     }
   }
 
@@ -359,5 +367,9 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
   @Log.NT(key = "Heading, deg")
   public double getHeading() {
     return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
+  }
+
+  public Command driveToNote() {
+    return Commands.none();
   }
 }

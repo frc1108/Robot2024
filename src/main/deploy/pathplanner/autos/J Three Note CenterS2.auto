@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8613298085272386,
-      "y": 6.681985456994171
+      "x": 1.3606430075114182,
+      "y": 5.551187918118234
     },
-    "rotation": 55.762537223142466
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -34,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "James ASTFL"
+                        "pathName": "James CSTRB"
                       }
                     },
                     {
@@ -58,7 +58,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "James MidFLTS"
+            "pathName": "James RBTCS"
           }
         },
         {
@@ -84,7 +84,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "James AfterShootTCL"
+                        "pathName": "James CSTRC"
                       }
                     },
                     {
@@ -103,6 +103,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "James RCTCS"
           }
         },
         {
