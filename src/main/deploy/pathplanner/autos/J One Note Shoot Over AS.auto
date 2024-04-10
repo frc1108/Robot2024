@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.45,
-      "y": 5.55
+      "x": 0.8613298085272386,
+      "y": 6.681985456994171
     },
-    "rotation": 0
+    "rotation": 55.762537223142466
   },
   "command": {
     "type": "sequential",
@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.6
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
@@ -40,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "CenterSWToRingB"
+                        "pathName": "James ASTFL"
                       }
                     },
                     {
@@ -62,22 +56,15 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "RingBToCenterSW"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CenteringNote"
-                }
-              }
-            ]
+            "pathName": "James MidFLTS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CenteringNote"
           }
         },
         {
@@ -87,12 +74,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.6
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
@@ -103,7 +84,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "CenterSWToRingA"
+                        "pathName": "James AfterShootTCL"
                       }
                     },
                     {
@@ -125,22 +106,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "RingAToLeftSW"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CenteringNote"
-                }
-              }
-            ]
+            "name": "CenteringNote"
           }
         },
         {

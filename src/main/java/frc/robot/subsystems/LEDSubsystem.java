@@ -42,6 +42,7 @@ public class LEDSubsystem extends SubsystemBase {
 	private TrobotAddressableLEDPattern m_redPattern = new SolidColorPattern(Color.kRed);
 	private TrobotAddressableLEDPattern m_purplePattern = new SolidColorPattern(Color.kPurple);
 	private TrobotAddressableLEDPattern m_yellowPattern = new SolidColorPattern(Color.kYellow);
+	private TrobotAddressableLEDPattern m_orangePattern = new SolidColorPattern(Color.kOrange);
 	private TrobotAddressableLEDPattern m_flashPattern = new BlinkingPattern(Color.kWhite,0.1);
 	private TrobotAddressableLEDPattern m_disabledPattern = new RainbowPattern();
 	private TrobotAddressableLEDPattern m_rainbowMeter; 
@@ -68,7 +69,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     m_patternList = new ArrayList<TrobotAddressableLEDPattern>
                         (Arrays.asList(m_redPattern,m_bluePattern,m_blackPattern,m_flashPattern,
-                                       m_yellowPattern, m_purplePattern,
+                                       m_yellowPattern, m_orangePattern, m_purplePattern,
                                        m_disabledPattern,m_rainbowMeter,m_blueSoundMeter,m_redSoundMeter));
 
 
@@ -100,6 +101,18 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void yellow() {
     setPattern(m_yellowPattern);
+  }
+
+  public void orange() {
+    setPattern(m_yellowPattern);
+  }
+
+  public void hasNote() {
+    setPattern(m_yellowPattern);
+  }
+
+  public void rainbow() {
+    setPattern(m_disabledPattern);
   }
 
   public void startCrowdMeter(Alliance alliance) {

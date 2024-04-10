@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8,
-      "y": 6.75
+      "x": 0.9274153789810271,
+      "y": 6.667299774671107
     },
-    "rotation": 60.0
+    "rotation": 52.224315694045295
   },
   "command": {
     "type": "sequential",
@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.75
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
@@ -40,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "LeftSWToRingA"
+                        "pathName": "James ASTRA"
                       }
                     },
                     {
@@ -64,19 +58,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RingAToLeftSW"
+            "pathName": "James RATA"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "CenteringNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
           }
         }
       ]

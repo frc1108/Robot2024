@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8,
-      "y": 6.75
+      "x": 1.3606430075114182,
+      "y": 5.551187918118234
     },
-    "rotation": 60.0
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.75
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
@@ -40,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "LeftSWToRingA"
+                        "pathName": "James CSTRB"
                       }
                     },
                     {
@@ -64,7 +58,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RingAToLeftSW"
+            "pathName": "James RBTCS"
           }
         },
         {

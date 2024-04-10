@@ -5,10 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,6 +17,7 @@ import frc.robot.Constants.HendersonConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.UnderrollerConstants;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Brake;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.Underroller;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 import java.io.IOException;
@@ -36,6 +38,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import monologue.Monologue;
 import monologue.Annotations.Log;
@@ -55,13 +58,15 @@ public class RobotContainer implements Logged{
   private final HendersonFeeder m_feeder = new HendersonFeeder();
   private final HendersonLauncher m_launcher  = new HendersonLauncher();
   private final LEDSubsystem m_led = new LEDSubsystem();
+  private final Brake m_brake = new Brake();
   private Vision m_vision;
+
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
 
-  @Log.NT private final Field2d m_field;
+  @Log.NT private final Field2d m_path;
   @Log.NT private final SendableChooser<Command> m_autoChooser;
   private int m_invertDriveAlliance = -1;
 
@@ -69,12 +74,15 @@ public class RobotContainer implements Logged{
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() { 
-    m_field = new Field2d();
+    m_path = new Field2d();
     
     // Robot configs
     configureButtonBindings();
+
+    // 
     configureNamedCommands();
     m_autoChooser = AutoBuilder.buildAutoChooser();
+
     setupMonologue();
     setupPathPlannerLog();
     try {
@@ -113,31 +121,73 @@ public class RobotContainer implements Logged{
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    //**** TRIGGERS ****/
+    //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
+    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
+    new Trigger(()->!m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.off()));
+    new Trigger(()->m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.orange()));
 
+
+    // RobotModeTriggers.disabled().onTrue(Commands.sequence(Commands.runOnce(()->m_led.rainbow()),
+    //                                                       Commands.waitSeconds(6),
+    //                                                       Commands.runOnce(()->m_arm.setIdle(IdleMode.kCoast))));
+    m_operatorController.axisGreaterThan(0, 0.5).debounce(0.2).onTrue(Commands.print("Axis Trigger"));                                                      
+    //**** DRIVER CONTROLS ****/
     //m_driverController.a().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
+    m_driverController.x().onTrue(Commands.runOnce(() -> m_robotDrive.startVisionPose()));
+    m_driverController.y().onTrue(Commands.parallel(
+                                    Commands.runOnce(() -> m_robotDrive.stopVisionPose()),
+                                    Commands.runOnce(()->m_robotDrive.zeroHeading())
+                                  ));
+                                  //.andThen(Commands.runOnce(()->m_robotDrive.resetOdometry(m_robotDrive.getPose()))));
     m_driverController.b().whileTrue(Commands.run(() -> m_robotDrive.setX(),m_robotDrive));
     m_driverController.povLeft().onTrue(Commands.runOnce(m_led::nextPattern,m_led));
+    m_operatorController.back().onTrue(m_brake.brake());
+    m_driverController.back().onTrue(m_brake.unbrake());
 
+    //**** OPERATOR CONTROLS ****
+    m_operatorController.a().whileTrue(Commands.runEnd(
+                                         ()->m_feeder.set(HendersonConstants.kFeederBackSpeed),
+                                         ()->m_feeder.set(0),m_feeder));
+    m_operatorController.b().whileTrue(Commands.runEnd(
+                                         ()->m_feeder.set(HendersonConstants.kFeederFrontSpeed),
+                                         ()->m_feeder.set(0),m_feeder));
+    m_operatorController.x().whileTrue(Commands.runEnd(
+                                         ()->m_launcher.set(HendersonConstants.kLauncherFrontSpeed),
+                                         ()->m_launcher.set(0),m_launcher));
+    m_operatorController.y().whileTrue(Commands.runEnd(
+                                         ()->m_launcher.set(HendersonConstants.kLauncherBackSpeed),
+                                         ()->m_launcher.set(0),m_launcher));
+    
+    m_operatorController.axisGreaterThan(0,0.75).onTrue(shoot());
+    m_operatorController.axisLessThan(0,-0.75).onTrue(shootBackwards());
+    m_operatorController.axisGreaterThan(1,0.75).onTrue(intakeNote());
+    m_operatorController.axisLessThan(1,-0.75).onTrue(centeringNote());
 
+    m_operatorController.start().onTrue(Commands.runOnce(()->m_arm.enableClimb()));
+    m_operatorController.back().onTrue(Commands.runOnce(()->m_arm.disableClimb()));
+    
     m_operatorController.leftBumper().whileTrue(m_underroller.runUnderroller().withName("Intaking"));
     m_operatorController.rightBumper().whileTrue(m_underroller.reverseUnderroller().withName("Outtaking"));
-
-
-// m_operatorController.start().onTrue(m_arm.toggleArmEnableCommand());
-
+    
     m_operatorController.povDown().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
     m_operatorController.povRight().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads));
     m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
+    m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
 
-    m_operatorController.x().whileTrue(Commands.runEnd(()->m_launcher.set(0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
-    m_operatorController.y().whileTrue(Commands.runEnd(()->m_launcher.set(-0.75),()->m_launcher.set(0),m_launcher));//Commands.startEnd(m_launcher::run,m_launcher::stop,m_launcher));
-    m_operatorController.start().onTrue(shoot());
-    //m_operatorController.b().whileTrue(Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
-    m_operatorController.a().whileTrue(Commands.runEnd(()->m_feeder.set(1),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
-    m_operatorController.b().whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
-    m_operatorController.back().onTrue(intakeNote()); //whileTrue(Commands.runEnd(()->m_feeder.set(-0.55),()->m_feeder.set(0),m_feeder));//Commands.startEnd(m_feeder::run,m_feeder::stop,m_feeder));
-  }
+    m_operatorController.axisGreaterThan(5,-0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+1*ArmConstants.kArmShootingStepsRads));
+    m_operatorController.axisGreaterThan(4,0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+2*ArmConstants.kArmShootingStepsRads));
+    m_operatorController.axisGreaterThan(5,0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+1*ArmConstants.kArmPickupStepsRads));
+    m_operatorController.axisGreaterThan(4,-0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+2*ArmConstants.kArmPickupStepsRads));
+
+    m_driverController.axisGreaterThan(3, 0.75).onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
+      }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -149,44 +199,17 @@ public class RobotContainer implements Logged{
   }
 
   private void configureNamedCommands() {
-      // NamedCommands.registerCommand("none", Commands.none());
       NamedCommands.registerCommand("LaunchNote", shoot());
       NamedCommands.registerCommand("IntakeNote", intakeNote());
       NamedCommands.registerCommand("ShootBackwards", shootBackwards());
       NamedCommands.registerCommand("CenteringNote", centeringNote());
-      // NamedCommands.registerCommand("waitOne", Commands.waitSeconds(1));
     }
-
-  private void configureAutoChooser() {
-  //   autoChooser.setDefaultOption("Nothing", Commands.none());
-  //   autoChooser.addOption("Test Auto", TestAuto());
-  //   autoChooser.addOption("Two Note Left", TwoNoteLeft());
-  //   autoChooser.addOption("Two Note Center", TwoNoteCenter());
-  //   autoChooser.addOption("Three Note Center", ThreeNoteCenter());
-  //   SmartDashboard.putData("Auto Chooser",autoChooser);
-   }
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
-    m_invertDriveAlliance = (alliance == Alliance.Blue)?1:-1;
+    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:-1; //TODO Fix the invert problem
   }
    
-  // public Command TestAuto() {
-  //     return new PathPlannerAuto("Test Auto");
-  // }
-
-  // public Command TwoNoteLeft() {
-  //     return new PathPlannerAuto("Two Note Left");
-  // }
-
-  // public Command TwoNoteCenter() {
-  //     return new PathPlannerAuto("Two Note Center");
-  // }
-
-  // public Command ThreeNoteCenter() {
-  //     return new PathPlannerAuto("Three Note Center");
-  // }
-
   public Command intakeNote() {
     return 
       Commands.sequence(
@@ -197,16 +220,19 @@ public class RobotContainer implements Logged{
           Commands.runOnce(()->m_feeder.set(HendersonConstants.kIntakeFeederSpeed),m_feeder),
           Commands.runOnce(()->m_underroller.setUnderrollerspeed(UnderrollerConstants.kUnderrollerIntakeSpeed),m_underroller),
           Commands.runOnce(()->m_led.yellow()),
-          Commands.runOnce(()->m_feeder.enableLimitSwitches())),
-        Commands.race(Commands.waitUntil(()->m_feeder.getBeamBreak()),Commands.waitSeconds(5)),
+          Commands.runOnce(()->m_feeder.enableLimitSwitches())
+        ),
+        Commands.race(Commands.waitUntil(()->m_feeder.getBeamBreak()),Commands.waitSeconds(5))
+        .finallyDo(()->
           Commands.parallel(
-          Commands.runOnce(()->m_launcher.set(0),m_launcher),
-          Commands.runOnce(()->m_feeder.set(0),m_feeder),
-          Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller),
-          Commands.runOnce(()->m_feeder.disableLimitSwitches())),
-        Commands.waitSeconds(0.5),
-        Commands.runOnce(()->m_led.off())
-        );
+            Commands.runOnce(()->m_launcher.set(0),m_launcher),
+            Commands.runOnce(()->m_feeder.set(0),m_feeder),
+            Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller),
+            Commands.runOnce(()->m_feeder.disableLimitSwitches()),
+            Commands.runOnce(()->m_led.off())
+          )
+        )
+      );
   }
 
   public Command shoot() {
@@ -217,7 +243,7 @@ public class RobotContainer implements Logged{
         Commands.waitSeconds(0.75),
         Commands.runOnce(()->m_feeder.set(-0.6)),
         Commands.waitSeconds(0.2),
-        Commands.runOnce(()->m_feeder.set(0)),
+        m_feeder.stop(),
         Commands.runOnce(()->m_launcher.set(0))
      );
   }
@@ -226,27 +252,25 @@ public class RobotContainer implements Logged{
     return Commands.sequence(
       Commands.runOnce(()->m_feeder.disableLimitSwitches()),
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads-Units.degreesToRadians(2)),
-      Commands.waitSeconds(0.2),
+      Commands.waitSeconds(0.3),
       Commands.runOnce(()->m_feeder.set(1)),
-      Commands.waitSeconds(0.25),
+      Commands.waitSeconds(0.3),
       Commands.runOnce(()->m_launcher.set(0.8)),
-      Commands.waitSeconds(0.75)).andThen(
+      Commands.waitSeconds(0.75)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),
-                        Commands.runOnce(()->m_feeder.set(0.0)))
-                          );
+                        Commands.runOnce(()->m_feeder.set(0.0)),
+                        Commands.runOnce(()->m_feeder.enableLimitSwitches())));
   }
 
   public Command centeringNote() {
     return Commands.sequence(
-      Commands.runOnce(()->m_feeder.disableLimitSwitches()),
-      Commands.parallel(Commands.runOnce(()->m_launcher.set(-0.1)),
+      Commands.parallel(Commands.runOnce(()->m_launcher.set(0.1)),
                         Commands.runOnce(()->m_feeder.set(-0.5))),
-      Commands.waitSeconds(0.1)).andThen(
+       Commands.waitSeconds(0.05)).finallyDo(()->
         Commands.parallel(
                         Commands.runOnce(()->m_launcher.set(0.0)),
-                        Commands.runOnce(()->m_feeder.set(0.0)))
-                          );
+                        Commands.runOnce(()->m_feeder.set(0.0))));
   }
 
   public void setupMonologue() {
@@ -264,19 +288,20 @@ public class RobotContainer implements Logged{
     // Logging callback for current robot pose
     PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
         // Do whatever you want with the pose here
-        m_field.setRobotPose(pose);
+        m_path.setRobotPose(pose);
     });
 
     // Logging callback for target robot pose
     PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
       // Do whatever you want with the pose here
-      m_field.getObject("target pose").setPose(pose);
+      m_path.getObject("target pose").setPose(pose);
     });
 
     // Logging callback for the active path, this is sent as a list of poses
     PathPlannerLogging.setLogActivePathCallback((poses) -> {
       // Do whatever you want with the poses here
-      m_field.getObject("path").setPoses(poses);
+      m_path.getObject("path").setPoses(poses);
     });
   }
+  
 }

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -11,20 +13,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.DriverStation;
-
-import java.util.function.DoubleSupplier;
-
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonPipelineResult;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -32,32 +32,52 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.NoteVisionConstants;
 import frc.utils.SwerveUtils;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSubsystem extends SubsystemBase {
+import monologue.Logged;
+import monologue.Annotations.Log;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonPipelineResult;
+
+public class DriveSubsystem extends SubsystemBase implements Logged {
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftChassisAngularOffset);
+      DriveConstants.kFrontLeftChassisAngularOffset,
+      DriveConstants.kFrontLeftDrivingkS,
+      DriveConstants.kFrontLeftDrivingkV,
+      DriveConstants.kFrontLeftDrivingkA);
 
   private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
+      DriveConstants.kFrontRightChassisAngularOffset,
+      DriveConstants.kFrontRightDrivingkS,
+      DriveConstants.kFrontRightDrivingkV,
+      DriveConstants.kFrontRightDrivingkA);
 
   private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
+      DriveConstants.kBackLeftChassisAngularOffset,
+      DriveConstants.kRearLeftDrivingkS,
+      DriveConstants.kRearLeftDrivingkV,
+      DriveConstants.kRearLeftDrivingkA);
 
   private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
+      DriveConstants.kBackRightChassisAngularOffset,
+      DriveConstants.kRearRightDrivingkS,
+      DriveConstants.kRearRightDrivingkV,
+      DriveConstants.kRearRightDrivingkA);
 
   // The gyro sensor
   private final Pigeon2 m_gyro = new Pigeon2(0);
@@ -77,7 +97,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final ProfiledPIDController pid = new ProfiledPIDController(5.0, 0, 0, pidConstraints);
 
   // Odometry class for tracking robot pose
-  SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
+  private SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(-m_gyro.getAngle()),
       new SwerveModulePosition[] {
@@ -88,7 +108,10 @@ public class DriveSubsystem extends SubsystemBase {
       },
       new Pose2d());
 
+  @Log.NT(key = "Field") private final Field2d m_field = new Field2d();
+  @Log.NT(key = "Vision Enabled") private boolean isVisionAdded = true;
 
+  //private final PhotonCamera noteCamera = new PhotonCamera(NoteVisionConstants.kCameraName);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -116,6 +139,8 @@ public class DriveSubsystem extends SubsystemBase {
       }, // should flip path boolean supplier
       this
     );
+
+    //m_odometry.setVisionMeasurementStdDevs(null);
   }
 
   @Override
@@ -130,14 +155,13 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
 
-    SmartDashboard.putNumber("gyro angle", m_gyro.getAngle());
-    SmartDashboard.putNumber("pose angle", m_odometry.getEstimatedPosition().getRotation().getDegrees());
-    SmartDashboard.putNumber("pose X", m_odometry.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("pose Y", m_odometry.getEstimatedPosition().getY());
-    SmartDashboard.putNumber("left front speed",m_frontLeft.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("left rear speed",m_rearLeft.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("right front speed",m_frontRight.getState().speedMetersPerSecond);
-    SmartDashboard.putNumber("right rear speed",m_rearRight.getState().speedMetersPerSecond);
+    m_field.setRobotPose(m_odometry.getEstimatedPosition());
+
+    // Log current speed of drive motors
+    this.log("LF Speed",Math.abs(m_frontLeft.getState().speedMetersPerSecond));
+    this.log("RL Speed",Math.abs(m_rearLeft.getState().speedMetersPerSecond));
+    this.log("FR Speed",Math.abs(m_frontRight.getState().speedMetersPerSecond));
+    this.log("RR Speed",Math.abs(m_rearRight.getState().speedMetersPerSecond));
 
 
   }
@@ -147,8 +171,27 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The pose.
    */
+  @Log.NT(key = "Robot pose")
   public Pose2d getPose() {
     return m_odometry.getEstimatedPosition();
+  }
+
+  @Log.NT(key = "Speaker pose")
+  public Pose2d getSpeakerPose() {
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      return new Pose2d(0.0, 
+                        Units.inchesToMeters(219.277), new Rotation2d());
+    } else {
+      return new Pose2d(Units.inchesToMeters(651.223),
+                        Units.inchesToMeters(219.277), 
+                        new Rotation2d(Units.degreesToRadians(180)));
+    }  
+  }
+
+  @Log.NT(key = "Speaker distance meters")
+  public double getDistanceToSpeakerMeters() {
+    return PhotonUtils.getDistanceToPose(getPose(), 
+    getSpeakerPose());
   }
 
   /**
@@ -169,7 +212,27 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void visionPose(Pose2d pose,double timestamp){
-    m_odometry.addVisionMeasurement(pose, timestamp);
+    if (isVisionAdded) {
+      m_odometry.addVisionMeasurement(pose, timestamp);
+      this.log("Vision target added",pose);
+    }
+  }
+
+  public void stopVisionPose(){
+    isVisionAdded = false;
+  }
+
+  public void startVisionPose(){
+    isVisionAdded = true;
+  }
+
+  @Log.NT(key = "Vision Enabled")
+  public boolean getVisionAdded(){
+    return isVisionAdded;
+  }
+
+  public void setVisionStdDevs(double xMeters, double yMeters, double thetaRads) {
+    m_odometry.setVisionMeasurementStdDevs(VecBuilder.fill(xMeters,yMeters,thetaRads));
   }
 
   /**
@@ -242,13 +305,18 @@ public class DriveSubsystem extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-m_gyro.getAngle()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
+                getPose().getRotation())
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    this.log("FL Setpoint",swerveModuleStates[0].speedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    this.log("FR Setpoint",swerveModuleStates[1].speedMetersPerSecond);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
+    this.log("RL Setpoint",swerveModuleStates[2].speedMetersPerSecond);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    this.log("RR Setpoint",swerveModuleStates[3].speedMetersPerSecond);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
@@ -266,6 +334,7 @@ public class DriveSubsystem extends SubsystemBase {
     this.driveRobotRelative(speeds);
   }
   
+  @Log.NT(key = "Chassis Speed")
   public ChassisSpeeds getRobotRelativeSpeeds(){
     return DriveConstants.kDriveKinematics.toChassisSpeeds(m_frontLeft.getState(),
                                                            m_frontRight.getState(),
@@ -297,7 +366,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
-  /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
     m_rearLeft.resetEncoders();
@@ -305,17 +373,24 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.resetEncoders();
   }
 
-  /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    m_odometry.resetPosition(
+        Rotation2d.fromDegrees(-m_gyro.getAngle()),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+        },
+        new Pose2d(getPose().getTranslation(), new Rotation2d()));
   }
 
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
+  @Log.NT(key = "Heading, deg")
   public double getHeading() {
     return Rotation2d.fromDegrees(-m_gyro.getAngle()).getDegrees();
+  }
+
+  public Command driveToNote() {
+    return Commands.none();
   }
 }

@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,8 +23,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
-public class Arm extends TrapezoidProfileSubsystem {
+public class Arm extends TrapezoidProfileSubsystem implements Logged{
   /** Creates a new Arm. */
   private final CANSparkMax m_leftMotor = new CANSparkMax(ArmConstants.kLeftArmMotorCanId, MotorType.kBrushless);
   private final CANSparkMax m_rightMotor = new CANSparkMax(ArmConstants.kRightArmMotorCanId, MotorType.kBrushless);
@@ -36,6 +39,8 @@ public class Arm extends TrapezoidProfileSubsystem {
     ArmConstants.kSVolts, ArmConstants.kGVolts, 
     ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
   private double m_goal = ArmConstants.kArmOffsetRads;
+
+  @Log.NT(key = "Climb Enabled") private boolean m_climbEnabled = false;
   
   public Arm() {
     super(
@@ -58,12 +63,20 @@ public class Arm extends TrapezoidProfileSubsystem {
   m_encoder.setVelocityConversionFactor(ArmConstants.kArmEncoderVelocityFactor);
   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 
-  m_pid.setP(ArmConstants.kP);
-  m_pid.setI(ArmConstants.kI);
-  m_pid.setD(ArmConstants.kD);
-  m_pid.setFF(ArmConstants.kFF);
+  m_pid.setP(ArmConstants.kP,ArmConstants.kSlotDefault);
+  m_pid.setI(ArmConstants.kI,ArmConstants.kSlotDefault);
+  m_pid.setD(ArmConstants.kD,ArmConstants.kSlotDefault);
+  m_pid.setFF(ArmConstants.kFF,ArmConstants.kSlotDefault);
   m_pid.setOutputRange(ArmConstants.kMinOutput,
-        ArmConstants.kMaxOutput);
+        ArmConstants.kMaxOutput,ArmConstants.kSlotDefault);
+
+  // Gain schedule for climbing
+  m_pid.setP(ArmConstants.kPClimb,ArmConstants.kSlotClimb);
+  m_pid.setI(ArmConstants.kIClimb,ArmConstants.kSlotClimb);
+  m_pid.setD(ArmConstants.kDClimb,ArmConstants.kSlotClimb);
+  m_pid.setFF(ArmConstants.kFFClimb,ArmConstants.kSlotClimb);
+  m_pid.setOutputRange(ArmConstants.kMinOutputClimb,
+        ArmConstants.kMaxOutputClimb,ArmConstants.kSlotClimb);
 
   // Apply current limit and idle mode
   m_leftMotor.setIdleMode(IdleMode.kBrake);
@@ -80,17 +93,6 @@ public class Arm extends TrapezoidProfileSubsystem {
   public void periodic(){
     super.setGoal(m_goal);
     super.periodic();
-
-    SmartDashboard.putNumber("Arm Goal", m_goal);
-    SmartDashboard.getNumber("Arm Goal", MathUtil.clamp(m_goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1));
-    SmartDashboard.putNumber("Arm Position", getPositionRadians());
-    SmartDashboard.putNumber("Motor Output", getMotorCurrent());
-    SmartDashboard.putBoolean("Left Follower", m_leftMotor.isFollower());
-    SmartDashboard.putBoolean("Right Follower", m_rightMotor.isFollower());
-    SmartDashboard.putNumber("Left Output", m_leftMotor.get());
-    SmartDashboard.putNumber("Right Output", m_rightMotor.get());
-    SmartDashboard.putNumber("Position Conv", m_encoder.getPositionConversionFactor());
-    SmartDashboard.putNumber("Vel Conv", m_encoder.getVelocityConversionFactor());
   }
 
   @Override
@@ -99,59 +101,67 @@ public class Arm extends TrapezoidProfileSubsystem {
   double feedforward = m_feedforward.calculate(setpoint.position,
                                                setpoint.velocity);
 
-  SmartDashboard.putNumber("Feedforward", feedforward);
-  SmartDashboard.putNumber("Setpoint Position", setpoint.position);
-  SmartDashboard.putNumber("Setpoint Velocity", setpoint.velocity);
+  this.log("Feedforward", feedforward);
+  this.log("Setpoint Position", setpoint.position);
+  this.log("Setpoint Velocity", setpoint.velocity);
 
   
   // Add the feedforward to the PID output to get the motor output
-  m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
-                     ControlType.kPosition, 0, feedforward);
-}
+    if (!m_climbEnabled) {
+      m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
+                      ControlType.kPosition, ArmConstants.kSlotDefault, feedforward);
+    } else {
+      m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
+                    ControlType.kPosition, ArmConstants.kSlotClimb, feedforward);
+    }
+  }
 
-public Command setArmGoalCommand(double goal) {
-return Commands.runOnce(() -> setArmGoal(goal), this);
-}
+  public Command setArmGoalCommand(double goal) {
+  return Commands.runOnce(() -> setArmGoal(goal), this);
+  }
 
-public void set(double speed) {
-  m_leftMotor.set(speed);
-}
+  public void set(double speed) {
+    m_leftMotor.set(speed);
+  }
 
-public double getPositionRadians() {
-  return m_encoder.getPosition(); // + ArmConstants.kArmOffsetRads;
-}
+  @Log.NT(key = "Arm Pos Rads")
+  public double getPositionRadians() {
+    return m_encoder.getPosition();
+  }
 
-public Command setArmManual(DoubleSupplier speed) {
-  return Commands.run(()->setArmGoal(getArmGoal()+speed.getAsDouble()/(2*Math.PI)),this);
-}
+  @Log.NT(key = "Arm Goal Rads")
+  public double getArmGoal() {
+    return m_goal;
+  }
 
-public double getArmGoal() {
-  return m_goal;
-}
+  public void setArmGoal(double goal) {
+    
+    m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1);
+  }
 
-public void setArmGoal(double goal) {
-  
-  m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1);
-}
+  public Command setArmManual(DoubleSupplier speed) {
+    return Commands.run(()->setArmGoal(getArmGoal()+speed.getAsDouble()/(2*Math.PI)),this);
+  }
 
-public void setEncoderPosition(double position) {
-  m_encoder.setPosition(position);
-}
+  public void setEncoderPosition(double position) {
+    m_encoder.setPosition(position);
+  }
 
-public double getMotorCurrent(){
-  return m_leftMotor.getOutputCurrent();
-}
+  @Log.NT(key = "Arm, Amps")
+  public double getMotorCurrent(){
+    return m_leftMotor.getOutputCurrent();
+  }
 
-// public Command toggleArmEnableCommand(){
-//   return  runOnce(()->{
-//     if(m_enabled) {
-//       disable();
-//       m_enabled = false;
-//     } else {
-//       enable();
-//       m_enabled = true;
-//     }
-//   });
-// }
+  public void setIdle(IdleMode mode) {
+    m_leftMotor.setIdleMode(mode);
+  }
+
+  public void enableClimb() {
+    m_climbEnabled = true;
+  }
+
+  public void disableClimb() {
+    m_climbEnabled = true;
+  }
 }
   

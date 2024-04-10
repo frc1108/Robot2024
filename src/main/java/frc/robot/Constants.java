@@ -31,11 +31,11 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxSpeedMetersPerSecond = 5.5;
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
-    public static final double kDirectionSlewRate = 1.2; // radians per second
-    public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
+    public static final double kDirectionSlewRate = 1.5; // radians per second 1.2
+    public static final double kMagnitudeSlewRate = 2.0; // percent per second (1 = 100%) 1.8
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
@@ -65,6 +65,23 @@ public final class Constants {
     public static final int kRearLeftTurningCanId = 12;
     public static final int kFrontRightTurningCanId = 14;
     public static final int kRearRightTurningCanId = 16;
+
+    // Drive Module constants
+    public static final double kFrontLeftDrivingkS = 0.05; //0.125
+    public static final double kFrontLeftDrivingkV = 2.21; //2.21
+    public static final double kFrontLeftDrivingkA = 0.37; //0.37
+
+    public static final double kFrontRightDrivingkS = 0.05; //0.125
+    public static final double kFrontRightDrivingkV = 2.21; //2.21
+    public static final double kFrontRightDrivingkA = 0.37; //0.37
+
+    public static final double kRearLeftDrivingkS = 0.05;
+    public static final double kRearLeftDrivingkV = 2.21;
+    public static final double kRearLeftDrivingkA = 0.37;
+
+    public static final double kRearRightDrivingkS = 0.05;
+    public static final double kRearRightDrivingkV = 2.21;
+    public static final double kRearRightDrivingkA = 0.37;
   }
 
   public static final class ModuleConstants {
@@ -79,7 +96,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = VortexMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.0762; //0.07526; // 0.0762
+    public static final double kWheelDiameterMeters = 0.0762; // 0.072; // 0.0762 (Caliper and squeeze 3/28 3D printed -- Max 0.0753)
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -98,11 +115,19 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
     // Recalc values for arbfeedForward
-    // public static final double kDrivingkS = 0.0; 
-    // public static final double kDrivingkV = 2.09; //2.11
-    // public static final double kDrivingkA = 0.39; //0.39
+    public static final double kDrivingkS = 0.125; //0.08 //0.175
+    public static final double kDrivingkV = 2.21; //Must be greater than zero 2.21
+    public static final double kDrivingkA = 0.37; //Must be greater than zero 0.37
 
-    public static final double kDrivingP = 0.04; //0.04
+    // public static final double kDrivingP = 0.04; //0.04
+    // public static final double kDrivingI = 0;
+    // public static final double kDrivingD = 0;
+    // public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+    // public static final double kDrivingMinOutput = -1;
+    // public static final double kDrivingMaxOutput = 1;
+
+    // TEST Values turnoff PID
+    public static final double kDrivingP = 0.04; 
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
     public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
@@ -119,7 +144,7 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 80; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
@@ -136,10 +161,11 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
     public static final double kPXController = 2;
-    public static final double kDXController = 0;
-
     public static final double kPYController = 2;
     public static final double kPThetaController = 1;
+    // public static final double kPXController = 5;
+    // public static final double kPYController = 5;
+    // public static final double kPThetaController = 5;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
@@ -194,7 +220,7 @@ public final class Constants {
     public static final double kArmEncoderPositionPIDMinInput = kArmOffsetRads; // radians
     public static final double kArmEncoderPositionPIDMaxInput = kArmMaxRads; 
 
-    public static final int kArmMotorCurrentLimit = 40; // amps
+    public static final int kArmMotorCurrentLimit = 50; // amps
     
     public static final double kP = 4; //10000x
     public static final double kI = 0;
@@ -203,9 +229,18 @@ public final class Constants {
     public static final double kFF = 0;
     public static final double kMinOutput = -1;
     public static final double kMaxOutput = 1;
-    public static final double kMaxPositionErrorRad = 0.7854;
-    public static final double kMaxVelocityErrorRadPerSec = 1.8656;
-    public static final double kControlEffortVolts = 7;
+    // public static final double kMaxPositionErrorRad = 0.7854;
+    // public static final double kMaxVelocityErrorRadPerSec = 1.8656;
+    // public static final double kControlEffortVolts = 7;
+    public static final int kSlotDefault = 0;
+    public static final int kSlotClimb = 1;
+
+    public static final double kPClimb = 8; //10000x
+    public static final double kIClimb = 0;
+    public static final double kDClimb = 0.5;
+    public static final double kFFClimb = 0;
+    public static final double kMinOutputClimb = -1;
+    public static final double kMaxOutputClimb = 1;
 
     public static final double kMaxArmSpeedRpm = 
       NeoMotorConstants.kFreeSpeedRpm / kArmGearRatio ;
@@ -217,24 +252,50 @@ public final class Constants {
     public static final double kArmDeadband = 0.1;
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
-    public static final double kArmShootingAngleRads = Units.degreesToRadians(62.5);
-    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(45);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-36); //38
-    public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-44+12);
+    public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5);
+    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5
+    //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
+    public static final double kArmDownRads = Units.degreesToRadians(-40); //20 -39
+    public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
+    public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
+
   }
     
   public static final class HendersonConstants {
-    public static final int kLeftLauncherMotorCanId = 41;
-    public static final int kRightLauncherMotorCanId = 42;
-    public static final int kLeftFeederMotorCanId = 43;
-    public static final int kRightFeederMotorCanId = 44;
+    public static final int kLeftLauncherMotorCanId = 1;
+    public static final int kRightLauncherMotorCanId = 2;
+    public static final int kLeftFeederMotorCanId = 3;
+    public static final int kRightFeederMotorCanId = 4;
+
     public static final double kFeederGearRatio = 47/11;
-    public static final double kIntakeLauncherSpeed = 0.2;
-    public static final double kIntakeFeederSpeed = 0.45;
+    public static final double kIntakeLauncherSpeed = 0.1;
+    public static final double kIntakeFeederSpeed = 0.3;
+    public static double kLauncherIdleRpm = 1000;
+    public static double kMaxLauncherRpm = 4000;
+
+    public static double kLauncherP = 0.00025;
+    public static double kLauncherI = 0.0;
+    public static double kLauncherD = 0.00001;
+    public static double kLauncherFF = 0.0001505;
+    public static double kLauncherOutputMin = -1;
+    public static double kLauncherOutputMax = 1;
+
+    public static double kFeederBackSpeed = 1; // Feeder --> EXIT
+    public static double kFeederFrontSpeed = -0.55; // Feeder --> Launcher
+    public static double kLauncherFrontSpeed = 0.75; // Launcher --> EXIT
+    public static double kLauncherBackSpeed = -0.75; // Launcher --> Feeder
+    
+    public static double kLauncherIntakeNoteSpeed = -0.75; // Launcher --> Feeder
+    public static double kLauncherShootNoteBackSpeed = -0.75; // Launcher --> Feeder
+    public static double kLauncherCenteringSpeed = 0.1; // Launcher --> EXIT
+
+
+
+
   }
 
-  public static final class VisionConstants {
+  public static final class TagVisionConstants {
         public static final String kCameraName = "Tag Camera OV9281";
         public static final Transform3d kCameraOffset = new Transform3d(
             new Translation3d(
@@ -245,6 +306,20 @@ public final class Constants {
                 0.0,
                 Rotation2d.fromDegrees(25.0).getRadians(),
                 Rotation2d.fromDegrees(170).getRadians()
+            ));
+    }
+
+  public static final class NoteVisionConstants {
+        public static final String kCameraName = "Note Camera OV9782";
+        public static final Transform3d kCameraOffset = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(1.0),
+                Units.inchesToMeters(-11.5),
+                Units.inchesToMeters(24.50)),
+            new Rotation3d(
+                0.0,
+                Rotation2d.fromDegrees(25.0).getRadians(),
+                Rotation2d.fromDegrees(10).getRadians()
             ));
     }
 }

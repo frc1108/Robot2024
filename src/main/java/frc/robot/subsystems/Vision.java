@@ -17,26 +17,27 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import monologue.Logged;
 
-public class Vision extends SubsystemBase {
+public class Vision extends SubsystemBase implements Logged {
     private final PhotonCamera photonCamera;    
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> consumer;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) throws IOException{
-        photonCamera = new PhotonCamera(Constants.VisionConstants.kCameraName);
+        photonCamera = new PhotonCamera(Constants.TagVisionConstants.kCameraName);
         poseEstimator = new PhotonPoseEstimator(
             AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
             PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            Constants.VisionConstants.kCameraOffset);
+            Constants.TagVisionConstants.kCameraOffset);
         this.consumer = consumer;
     }
 
     @Override
     public void periodic(){
-        boolean connected = photonCamera.isConnected();
-        if (!connected)
-            return;
+      boolean connected = photonCamera.isConnected();
+      if (!connected)
+          return;
 
         PhotonPipelineResult pipelineResult = photonCamera.getLatestResult();
         boolean hasTargets = pipelineResult.hasTargets();
@@ -45,7 +46,7 @@ public class Vision extends SubsystemBase {
 
         List<PhotonTrackedTarget> badTargets = new ArrayList<>();
         for(PhotonTrackedTarget target : pipelineResult.targets){
-            if(target.getPoseAmbiguity()>0.5){
+            if(target.getPoseAmbiguity()>0.35){  // Changed from 0.5 ambiguity
                 badTargets.add(target);
             }
         }
@@ -61,4 +62,6 @@ public class Vision extends SubsystemBase {
 
         consumer.accept(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
     }
+
+
 }
