@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8,
-      "y": 6.75
+      "x": 1.25,
+      "y": 3.5
     },
-    "rotation": 60.0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -15,6 +15,18 @@
           "type": "named",
           "data": {
             "name": "CenteringNote"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Match49"
           }
         },
         {
@@ -40,7 +52,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "LeftSWToRingA"
+                        "pathName": "RightSWToRightCenter"
                       }
                     },
                     {
@@ -62,21 +74,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "RingAToLeftSW"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CenteringNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
+            "waitTime": 0.1
           }
         }
       ]

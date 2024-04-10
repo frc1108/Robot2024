@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8,
-      "y": 6.75
+      "x": 0.9127296966579629,
+      "y": 4.420390379242297
     },
-    "rotation": 60.0
+    "rotation": -51.95295746817389
   },
   "command": {
     "type": "sequential",
@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.75
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
@@ -40,13 +34,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "LeftSWToRingA"
+                        "pathName": "J Through Stage SS"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 9.0
                       }
                     }
                   ]
@@ -59,24 +53,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RingAToLeftSW"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "CenteringNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
           }
         }
       ]

@@ -5,7 +5,7 @@
       "x": 0.8,
       "y": 6.75
     },
-    "rotation": 60.0
+    "rotation": 54.28648103937242
   },
   "command": {
     "type": "sequential",
@@ -21,12 +21,6 @@
           "type": "named",
           "data": {
             "name": "ShootBackwards"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.75
           }
         },
         {
