@@ -28,6 +28,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -51,6 +54,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset,
+      DriveConstants.kFrontLeftDrivingkP,
       DriveConstants.kFrontLeftDrivingkS,
       DriveConstants.kFrontLeftDrivingkV,
       DriveConstants.kFrontLeftDrivingkA);
@@ -59,6 +63,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset,
+      DriveConstants.kFrontRightDrivingkP,
       DriveConstants.kFrontRightDrivingkS,
       DriveConstants.kFrontRightDrivingkV,
       DriveConstants.kFrontRightDrivingkA);
@@ -67,6 +72,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset,
+      DriveConstants.kRearLeftDrivingkP,
       DriveConstants.kRearLeftDrivingkS,
       DriveConstants.kRearLeftDrivingkV,
       DriveConstants.kRearLeftDrivingkA);
@@ -75,6 +81,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset,
+      DriveConstants.kRearRightDrivingkP,
       DriveConstants.kRearRightDrivingkS,
       DriveConstants.kRearRightDrivingkV,
       DriveConstants.kRearRightDrivingkA);
@@ -121,8 +128,8 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
       this::getRobotRelativeSpeeds,
       this::driveRobotRelative,
       new HolonomicPathFollowerConfig(
-        new PIDConstants(AutoConstants.kPXController,0,0),
-        new PIDConstants(AutoConstants.kPThetaController,0,0),
+        AutoConstants.kTranslationPid,
+        AutoConstants.kRotationPid,
         DriveConstants.kMaxSpeedMetersPerSecond, // max speed in m/s
         Math.sqrt(Math.pow(DriveConstants.kTrackWidth, 2)+Math.pow(DriveConstants.kWheelBase,2))/2, // Radius in meters of 28.5 x 18.5 inch robot using a^2 +b^2 = c^2
         new ReplanningConfig()
@@ -158,6 +165,8 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
     m_field.setRobotPose(m_odometry.getEstimatedPosition());
 
     // Log current speed of drive motors
+    //this.log("ActualModuleStates", {m_frontLeft.getState(),m_frontRight.getState()});
+    //this.log("ActualModuleStates",new SwerveModuleState[]())
     this.log("LF Speed",Math.abs(m_frontLeft.getState().speedMetersPerSecond));
     this.log("RL Speed",Math.abs(m_rearLeft.getState().speedMetersPerSecond));
     this.log("FR Speed",Math.abs(m_frontRight.getState().speedMetersPerSecond));
@@ -303,13 +312,16 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        fieldRelative
+    var swerveChassisSpeeds = fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
                 getPose().getRotation())
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
+    this.log("DesiredChassisSpeed",swerveChassisSpeeds);
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(swerveChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    this.log("RealDesiredChassisSpeed",DriveConstants.kDriveKinematics.toChassisSpeeds(swerveModuleStates));
+    //this.log("DesiredModuleStates",swerveModuleStates);
     this.log("FL Setpoint",swerveModuleStates[0].speedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     this.log("FR Setpoint",swerveModuleStates[1].speedMetersPerSecond);
@@ -327,11 +339,11 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
   public void drivetoNote(DoubleSupplier speed){
     var speeds = new ChassisSpeeds();
     var result = noteTarget.getBestTarget();
-    PhotonUtils.estimateCameraToTarget(m_prevTime, m_currentTranslationMag, m_currentTranslationDir, m_currentRotation)
+    //PhotonUtils.estimateCameraToTarget(m_prevTime, m_currentTranslationMag, m_currentTranslationDir, m_currentRotation)
     speeds.omegaRadiansPerSecond = 0;
     speeds.omegaRadiansPerSecond = 0;
     speeds.omegaRadiansPerSecond = 0;
-    this.driveRobotRelative(speeds);
+    //this.driveRobotRelative(speeds);
   }
   
   @Log.NT(key = "Chassis Speed")
@@ -350,6 +362,28 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  }
+  /**
+   * Sets the wheels forward.
+   */
+  public Command setAllWheelsForward() {
+    return Commands.run(()->{
+      m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+      m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+      m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+      m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    },this);
+  }
+  /**
+   * Sets the wheels right.
+   */
+  public Command setAllWheelsRight() {
+    return Commands.run(()->{
+      m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+      m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+      m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+      m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)));
+    },this);
   }
 
   /**

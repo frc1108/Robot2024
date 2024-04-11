@@ -203,6 +203,8 @@ public class RobotContainer implements Logged{
       NamedCommands.registerCommand("IntakeNote", intakeNote());
       NamedCommands.registerCommand("ShootBackwards", shootBackwards());
       NamedCommands.registerCommand("CenteringNote", centeringNote());
+      NamedCommands.registerCommand("AllWheelsForward", m_robotDrive.setAllWheelsForward());
+      NamedCommands.registerCommand("AllWheelsRight", m_robotDrive.setAllWheelsRight());
     }
 
   public void configureWithAlliance(Alliance alliance) {
@@ -213,7 +215,7 @@ public class RobotContainer implements Logged{
   public Command intakeNote() {
     return 
       Commands.sequence(
-        m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads),
+        m_arm.setArmGoalCommand(ArmConstants.kArmDownRads),
         Commands.waitSeconds(0.1),
         Commands.parallel(
           Commands.runOnce(()->m_launcher.set(HendersonConstants.kIntakeLauncherSpeed),m_launcher),
