@@ -318,23 +318,44 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
     this.log("DesiredChassisSpeed",swerveChassisSpeeds);
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(swerveChassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    this.log("RealDesiredChassisSpeed",DriveConstants.kDriveKinematics.toChassisSpeeds(swerveModuleStates));
+    // SwerveDriveKinematics.desaturateWheelSpeeds(
+    //     swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    setStates(swerveModuleStates);
     //this.log("DesiredModuleStates",swerveModuleStates);
-    this.log("FL Setpoint",swerveModuleStates[0].speedMetersPerSecond);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    this.log("FR Setpoint",swerveModuleStates[1].speedMetersPerSecond);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    this.log("RL Setpoint",swerveModuleStates[2].speedMetersPerSecond);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    this.log("RR Setpoint",swerveModuleStates[3].speedMetersPerSecond);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    // this.log("FL Setpoint",swerveModuleStates[0].speedMetersPerSecond);
+    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    // this.log("FR Setpoint",swerveModuleStates[1].speedMetersPerSecond);
+    // m_frontRight.setDesiredState(swerveModuleStates[1]);
+    // this.log("RL Setpoint",swerveModuleStates[2].speedMetersPerSecond);
+    // m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    // this.log("RR Setpoint",swerveModuleStates[3].speedMetersPerSecond);
+    // m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
-  public void driveRobotRelative(ChassisSpeeds speeds){
-    this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
+  public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
+    driveRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelativeSpeeds, getPose().getRotation()));
   }
+
+  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+
+    SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
+    setStates(targetStates);
+  }
+
+  public void setStates(SwerveModuleState[] targetStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(targetStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    this.log("RealDesiredChassisSpeed",DriveConstants.kDriveKinematics.toChassisSpeeds(targetStates));
+    this.log("DesiredModuleStates",targetStates);
+    m_frontLeft.setDesiredState(targetStates[0]);
+    m_frontRight.setDesiredState(targetStates[1]);
+    m_rearLeft.setDesiredState(targetStates[2]);
+    m_rearRight.setDesiredState(targetStates[3]);
+  }
+
+  // public void driveRobotRelative(ChassisSpeeds speeds){
+  //   this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
+  // }
 
   public void drivetoNote(DoubleSupplier speed){
     var speeds = new ChassisSpeeds();

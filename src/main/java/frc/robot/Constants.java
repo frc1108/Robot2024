@@ -148,8 +148,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final PIDConstants kTranslationPid = new PIDConstants(2.5,0,0);
-    public static final PIDConstants kRotationPid = new PIDConstants(1.75,0,0);
+    public static final PIDConstants kTranslationPid = new PIDConstants(5,0,0);
+    public static final PIDConstants kRotationPid = new PIDConstants(5,0,0);
   }
 
   public static final class VortexMotorConstants {
