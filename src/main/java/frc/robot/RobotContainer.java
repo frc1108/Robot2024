@@ -209,7 +209,7 @@ public class RobotContainer implements Logged{
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
-    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:-1; //TODO Fix the invert problem
+    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:1;
   }
    
   public Command intakeNote() {

@@ -32,7 +32,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 5; //5.5
+    public static final double kMaxSpeedMetersPerSecond = 5.76; //5.5
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.5; // radians per second 1.2
@@ -101,7 +101,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = VortexMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.072; // 0.072; // 0.0762 (Caliper and squeeze 3/28 3D printed -- Max 0.0753)
+    public static final double kWheelDiameterMeters = 0.072; //72; // 0.072; // 0.0762 (Caliper and squeeze 3/28 3D printed -- Max 0.0753)
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -148,8 +148,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final PIDConstants kTranslationPid = new PIDConstants(1.5,0,0.0);
-    public static final PIDConstants kRotationPid = new PIDConstants(1.0,0,0);
+    public static final PIDConstants kTranslationPid = new PIDConstants(2.5,0,0);
+    public static final PIDConstants kRotationPid = new PIDConstants(1.75,0,0);
   }
 
   public static final class VortexMotorConstants {
