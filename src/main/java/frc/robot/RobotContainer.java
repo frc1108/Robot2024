@@ -124,7 +124,7 @@ public class RobotContainer implements Logged{
     //**** TRIGGERS ****/
     //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
-    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
+    //TODO RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
     new Trigger(()->!m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.off()));
     new Trigger(()->m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.orange()));
 

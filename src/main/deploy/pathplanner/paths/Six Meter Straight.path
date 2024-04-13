@@ -4,24 +4,24 @@
     {
       "anchor": {
         "x": 1.45,
-        "y": 5.55
+        "y": 4.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.950000000000001,
-        "y": 5.55
+        "x": 1.950000000000002,
+        "y": 4.8
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.45,
-        "y": 5.55
+        "x": 7.55,
+        "y": 4.8
       },
       "prevControl": {
-        "x": 6.95,
-        "y": 5.55
+        "x": 7.05,
+        "y": 4.8
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "TEST 6 meter",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

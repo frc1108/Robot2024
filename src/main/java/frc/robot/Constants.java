@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -279,14 +280,19 @@ public final class Constants {
         public static final String kCameraName = "Tag Camera OV9281";
         public static final Transform3d kCameraOffset = new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(1.0),
-                Units.inchesToMeters(-11.5),
-                Units.inchesToMeters(8.50)),
+                Units.inchesToMeters(-6.0), // 1.0 in
+                Units.inchesToMeters(-12), // -12 in
+                Units.inchesToMeters(8.50)), //8.5 in
             new Rotation3d(
                 0.0,
-                Rotation2d.fromDegrees(25.0).getRadians(),
-                Rotation2d.fromDegrees(170).getRadians()
+                Rotation2d.fromDegrees(22.0).getRadians(),
+                Rotation2d.fromDegrees(175).getRadians()
             ));
+        public static final double kMaxDistanceMeters = 3;
+        public static final Pose2d kBlueSpeakerSubwoofer = 
+          new Pose2d(1.45,5.55,new Rotation2d(Units.degreesToRadians(0)));
+        public static final Pose2d kRedSpeakerSubwoofer = 
+          new Pose2d(15.15,5.55,new Rotation2d(Units.degreesToRadians(180)));
     }
 
   public static final class NoteVisionConstants {

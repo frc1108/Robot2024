@@ -11,6 +11,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -39,6 +40,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.NoteVisionConstants;
+import frc.robot.Constants.TagVisionConstants;
 import frc.utils.SwerveUtils;
 
 import monologue.Logged;
@@ -113,10 +115,12 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       },
+      //(DriverStation.getAlliance().get() == Alliance.Blue)?TagVisionConstants.kBlueSpeakerSubwoofer:TagVisionConstants.kRedSpeakerSubwoofer
       new Pose2d());
 
   @Log.NT(key = "Field") private final Field2d m_field = new Field2d();
   @Log.NT(key = "Vision Enabled") private boolean isVisionAdded = true;
+  @Log.NT(key = "Vision Target Added") private boolean m_visionAdded = false;
 
   //private final PhotonCamera noteCamera = new PhotonCamera(NoteVisionConstants.kCameraName);
 
@@ -222,8 +226,13 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
 
   public void visionPose(Pose2d pose,double timestamp){
     if (isVisionAdded) {
-      m_odometry.addVisionMeasurement(pose, timestamp);
-      this.log("Vision target added",pose);
+      var measuredDistance = PhotonUtils.getDistanceToPose(this.getPose(),pose);
+      this.log("Vision target distance",measuredDistance);
+      if (measuredDistance <= TagVisionConstants.kMaxDistanceMeters || !m_visionAdded) {
+        m_odometry.addVisionMeasurement(pose, timestamp);
+        this.log("Vision target added",pose);
+        m_visionAdded = true;
+      }
     }
   }
 
@@ -356,16 +365,14 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
   // public void driveRobotRelative(ChassisSpeeds speeds){
   //   this.drive(speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond,false,false);
   // }
-
-  public void drivetoNote(DoubleSupplier speed){
-    var speeds = new ChassisSpeeds();
-    var result = noteTarget.getBestTarget();
-    //PhotonUtils.estimateCameraToTarget(m_prevTime, m_currentTranslationMag, m_currentTranslationDir, m_currentRotation)
-    speeds.omegaRadiansPerSecond = 0;
-    speeds.omegaRadiansPerSecond = 0;
-    speeds.omegaRadiansPerSecond = 0;
-    //this.driveRobotRelative(speeds);
-  }
+  // @Log.NT(key = "Note Distance")
+  // public double distanceToNote(){
+  //   var result = noteTarget.getBestTarget();
+  //   return PhotonUtils.calculateDistanceToTargetMeters(Units.inchesToMeters(11.5),
+  //                                               0, //Note on ground
+  //                                               Units.degreesToRadians(-30),
+  //                                               result.getPitch());
+  // }
   
   @Log.NT(key = "Chassis Speed")
   public ChassisSpeeds getRobotRelativeSpeeds(){

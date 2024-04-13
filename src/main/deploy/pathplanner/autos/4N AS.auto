@@ -14,12 +14,6 @@
         {
           "type": "named",
           "data": {
-            "name": "CenteringNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ShootBackwards"
           }
         },
@@ -27,6 +21,57 @@
           "type": "wait",
           "data": {
             "waitTime": 0.6
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "4N ASTRA"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.25
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "4N RATCS"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
           }
         },
         {
@@ -46,7 +91,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.25
                       }
                     }
                   ]
@@ -68,28 +113,16 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RingBToCenterSW"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CenteringNote"
+                  "pathName": "4N RBTCS"
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
-          }
-        },
-        {
           "type": "wait",
           "data": {
-            "waitTime": 0.6
+            "waitTime": 0.25
           }
         },
         {
@@ -103,13 +136,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "CenterSWToRingA"
+                        "pathName": "James CSTRC"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.5
+                        "waitTime": 0.25
                       }
                     }
                   ]
@@ -131,22 +164,10 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RingAToLeftSW"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CenteringNote"
+                  "pathName": "4N RCTSS"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ShootBackwards"
           }
         }
       ]
