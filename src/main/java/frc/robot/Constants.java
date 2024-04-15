@@ -235,9 +235,9 @@ public final class Constants {
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
     public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5);
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-40); //37.5
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-40); //20 -39
+    public static final double kArmDownRads = Units.degreesToRadians(-37.5); //20 -39
     public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
     public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
 
@@ -280,12 +280,12 @@ public final class Constants {
         public static final String kCameraName = "Tag Camera OV9281";
         public static final Transform3d kCameraOffset = new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(-6.0), // 1.0 in
+                Units.inchesToMeters(-5), // 1.0 in
                 Units.inchesToMeters(-12), // -12 in
                 Units.inchesToMeters(8.50)), //8.5 in
             new Rotation3d(
                 0.0,
-                Rotation2d.fromDegrees(22.0).getRadians(),
+                Rotation2d.fromDegrees(20.0).getRadians(), //22
                 Rotation2d.fromDegrees(175).getRadians()
             ));
         public static final double kMaxDistanceMeters = 3;

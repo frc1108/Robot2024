@@ -86,7 +86,7 @@ public class RobotContainer implements Logged{
     setupMonologue();
     setupPathPlannerLog();
     try {
-      m_vision = new Vision(m_robotDrive::visionPose);
+      m_vision = new Vision(m_robotDrive::visionPose, m_robotDrive);
     }
      catch(IOException e) {
      DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
@@ -215,7 +215,7 @@ public class RobotContainer implements Logged{
   public Command intakeNote() {
     return 
       Commands.sequence(
-        m_arm.setArmGoalCommand(ArmConstants.kArmDownRads),
+        m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads),
         Commands.waitSeconds(0.1),
         Commands.parallel(
           Commands.runOnce(()->m_launcher.set(HendersonConstants.kIntakeLauncherSpeed),m_launcher),

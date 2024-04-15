@@ -18,20 +18,25 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.TagVisionConstants;
 import monologue.Logged;
 
 public class Vision extends SubsystemBase implements Logged {
     private final PhotonCamera photonCamera;    
     private final PhotonPoseEstimator poseEstimator;
+    private final AprilTagFieldLayout fieldLayout;
     private final BiConsumer<Pose2d, Double> consumer;
+    private final DriveSubsystem drive;
 
-    public Vision(BiConsumer<Pose2d, Double> consumer) throws IOException{
+    public Vision(BiConsumer<Pose2d, Double> consumer, DriveSubsystem drive) throws IOException{
         photonCamera = new PhotonCamera(Constants.TagVisionConstants.kCameraName);
+        fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
         poseEstimator = new PhotonPoseEstimator(
-            AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile),
+            fieldLayout,
             PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             Constants.TagVisionConstants.kCameraOffset);
         this.consumer = consumer;
+        this.drive = drive;
     }
 
     @Override
@@ -47,7 +52,9 @@ public class Vision extends SubsystemBase implements Logged {
 
         List<PhotonTrackedTarget> badTargets = new ArrayList<>();
         for(PhotonTrackedTarget target : pipelineResult.targets){
-            if(target.getPoseAmbiguity()>0.35){  // Changed from 0.5 ambiguity
+            var tagPose = fieldLayout.getTagPose(target.getFiducialId());
+            var distanceToTag = PhotonUtils.getDistanceToPose(drive.getPose(),tagPose.get().toPose2d());
+            if(target.getPoseAmbiguity()>0.35 || distanceToTag > TagVisionConstants.kMaxDistanceMeters){  // Changed from 0.5 ambiguity
                 badTargets.add(target);
             }
         }
