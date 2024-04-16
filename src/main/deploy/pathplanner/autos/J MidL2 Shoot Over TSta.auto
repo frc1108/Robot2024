@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8912185097097467,
-      "y": 4.431154316854089
+      "x": 0.919204747500404,
+      "y": 4.449811808714527
     },
-    "rotation": -55.00797980144137
+    "rotation": -50.4037913602497
   },
   "command": {
     "type": "sequential",
@@ -26,7 +26,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "James CNTC"
+            "pathName": "James CNTCLN"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "James CLNTLN"
           }
         }
       ]

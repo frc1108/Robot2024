@@ -2,31 +2,25 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.8912185097097467,
-      "y": 4.431154316854089
+      "x": 1.3856420440113608,
+      "y": 5.6065763040617
     },
-    "rotation": -55.00797980144137
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "TEST"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "ShootBackwards"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "James SSTFCN"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "James CNTC"
+            "name": "AmpShot"
           }
         }
       ]

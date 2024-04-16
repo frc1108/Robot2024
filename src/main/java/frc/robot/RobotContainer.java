@@ -201,6 +201,8 @@ public class RobotContainer implements Logged{
   private void configureNamedCommands() {
       NamedCommands.registerCommand("LaunchNote", shoot());
       NamedCommands.registerCommand("IntakeNote", intakeNote());
+      NamedCommands.registerCommand("AmpShot", AmpShot());
+      NamedCommands.registerCommand("Stop", Stop());
       NamedCommands.registerCommand("ShootBackwards", shootBackwards());
       NamedCommands.registerCommand("CenteringNote", centeringNote());
       NamedCommands.registerCommand("AllWheelsForward", m_robotDrive.setAllWheelsForward());
@@ -250,6 +252,25 @@ public class RobotContainer implements Logged{
      );
   }
 
+  public Command AmpShot() {
+     return Commands.sequence(
+         m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads),
+         Commands.waitSeconds(1.75),
+         Commands.runOnce(()->m_feeder.set(1.0)),
+         Commands.waitSeconds(1.0),
+         Commands.runOnce(()->m_feeder.set(0.0)),
+         m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads)
+      );
+   }
+
+  public Command Stop() {
+     return Commands.sequence(
+         Commands.runOnce(()->m_launcher.set(0)),
+         Commands.runOnce(()->m_feeder.set(0)),
+         Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller)
+      );
+   }
+  
     public Command shootBackwards() {
     return Commands.sequence(
       Commands.runOnce(()->m_feeder.disableLimitSwitches()),
