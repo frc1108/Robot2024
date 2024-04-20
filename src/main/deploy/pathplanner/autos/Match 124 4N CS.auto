@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.85,
-      "y": 6.696671139317234
+      "x": 1.4,
+      "y": 5.55
     },
-    "rotation": 52.08506699013333
+    "rotation": 0.6696035304897446
   },
   "command": {
     "type": "sequential",
@@ -34,7 +34,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "4N ASTRA"
+                        "pathName": "James CSTRC"
                       }
                     },
                     {
@@ -62,7 +62,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4N RATCS"
+                  "pathName": "4N RCTCS"
                 }
               }
             ]
@@ -136,7 +136,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "James CSTRC"
+                        "pathName": "James CSTRA"
                       }
                     },
                     {
@@ -164,7 +164,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4N RCTSS"
+                  "pathName": "4N RATCS"
                 }
               }
             ]
