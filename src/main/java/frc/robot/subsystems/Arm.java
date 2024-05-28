@@ -18,6 +18,10 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -38,7 +42,8 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
   new ArmFeedforward(
     ArmConstants.kSVolts, ArmConstants.kGVolts, 
     ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
-  private double m_goal = ArmConstants.kArmOffsetRads;
+  //private double m_goal = ArmConstants.kArmOffsetRads;
+  private final MutableMeasure<Angle> m_goal = MutableMeasure.zero(Radian);
 
   @Log.NT(key = "Climb Enabled") private boolean m_climbEnabled = false;
   
@@ -91,7 +96,7 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
 
   @Override
   public void periodic(){
-    super.setGoal(m_goal);
+    super.setGoal(m_goal.magnitude());
     super.periodic();
   }
 
@@ -116,7 +121,7 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
     }
   }
 
-  public Command setArmGoalCommand(double goal) {
+  public Command setArmGoalCommand(Measure<Angle> goal) {
   return Commands.runOnce(() -> setArmGoal(goal), this);
   }
 
@@ -130,17 +135,14 @@ public class Arm extends TrapezoidProfileSubsystem implements Logged{
   }
 
   @Log.NT(key = "Arm Goal Rads")
-  public double getArmGoal() {
+  public Measure<Angle> getArmGoal() {
     return m_goal;
   }
 
-  public void setArmGoal(double goal) {
+  public void setArmGoal(Measure<Angle> goal) {
     
-    m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1);
-  }
-
-  public Command setArmManual(DoubleSupplier speed) {
-    return Commands.run(()->setArmGoal(getArmGoal()+speed.getAsDouble()/(2*Math.PI)),this);
+    m_goal.mut_replace( 
+    MathUtil.clamp(goal.baseUnitMagnitude(),ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1),Radian);
   }
 
   public void setEncoderPosition(double position) {

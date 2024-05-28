@@ -19,6 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -227,7 +229,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
         pose);
   }
 
-  public void visionPose(Pose2d pose,double timestamp){
+  public void visionPose(Pose2d pose,MutableMeasure<Time> timestamp){
     if (isVisionAdded) {
       // var tagPose = DriverStation.getAlliance().get() == Alliance.Blue?
       //                     TagVisionConstants.kBlueSpeakerSubwoofer:
@@ -235,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase implements Logged {
       // var measuredDistance = PhotonUtils.getDistanceToPose(this.getPose(),speakerPose);
       //this.log("Vision target distance",measuredDistance);
       //if (measuredDistance <= TagVisionConstants.kMaxDistanceMeters || !m_visionAdded) {
-        m_odometry.addVisionMeasurement(pose, timestamp);
+        m_odometry.addVisionMeasurement(pose, timestamp.baseUnitMagnitude());
         // this.log("Vision target added",pose);
         m_visionAdded = true;
       // }

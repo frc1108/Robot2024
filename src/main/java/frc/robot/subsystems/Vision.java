@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.TagVisionConstants;
@@ -25,10 +29,11 @@ public class Vision extends SubsystemBase implements Logged {
     private final PhotonCamera photonCamera;    
     private final PhotonPoseEstimator poseEstimator;
     private final AprilTagFieldLayout fieldLayout;
-    private final BiConsumer<Pose2d, Double> consumer;
+    //private final BiConsumer<Pose2d, Double> consumer;
+    private final BiConsumer<Pose2d, MutableMeasure<Time>> consumer;
     private final DriveSubsystem drive;
 
-    public Vision(BiConsumer<Pose2d, Double> consumer, DriveSubsystem drive) throws IOException{
+    public Vision(BiConsumer<Pose2d, MutableMeasure<Time>> consumer, DriveSubsystem drive) throws IOException{
         photonCamera = new PhotonCamera(Constants.TagVisionConstants.kCameraName);
         fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
         poseEstimator = new PhotonPoseEstimator(
@@ -68,7 +73,7 @@ public class Vision extends SubsystemBase implements Logged {
 
         EstimatedRobotPose estimatedPose = poseResult.get();
 
-        consumer.accept(estimatedPose.estimatedPose.toPose2d(), estimatedPose.timestampSeconds);
+        consumer.accept(estimatedPose.estimatedPose.toPose2d(), Seconds.of(estimatedPose.timestampSeconds).mutableCopy());
     }
 
 

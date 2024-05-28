@@ -178,13 +178,13 @@ public class RobotContainer implements Logged{
     //m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
 
     m_operatorController.axisGreaterThan(5,-0.75).onTrue(
-      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+1*ArmConstants.kArmShootingStepsRads));
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads.plus(ArmConstants.kArmShootingStepsRads)));
     m_operatorController.axisGreaterThan(4,0.75).onTrue(
-      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+2*ArmConstants.kArmShootingStepsRads));
+      m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads.plus(ArmConstants.kArmShootingStepsRads.times(2))));
     m_operatorController.axisGreaterThan(5,0.75).onTrue(
-      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+1*ArmConstants.kArmPickupStepsRads));
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads.plus(ArmConstants.kArmPickupStepsRads)));
     m_operatorController.axisGreaterThan(4,-0.75).onTrue(
-      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+2*ArmConstants.kArmPickupStepsRads));
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads.plus(ArmConstants.kArmPickupStepsRads.times(2))));
     m_operatorController.axisGreaterThan(2,0.75).onTrue(
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
     m_operatorController.axisGreaterThan(3,0.75).onTrue(

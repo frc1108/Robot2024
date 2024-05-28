@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+
 import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
@@ -16,6 +19,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.ImmutableMeasure;
+import edu.wpi.first.units.Measure;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -40,16 +47,15 @@ public final class Constants {
     public static final double kMagnitudeSlewRate = 2.0; // percent per second (1 = 100%) 1.8
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
-    // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(23.5);
-    // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(28.5);
+    //public static final double kTrackWidth = Units.inchesToMeters(23.5);
+    public static final Measure<Distance> kTrackWidth = Inches.of(23.5);
+    public static final Measure<Distance> kWheelBase = Inches.of(28.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-        new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-        new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+        new Translation2d(kWheelBase.baseUnitMagnitude() / 2, kTrackWidth.baseUnitMagnitude() / 2),
+        new Translation2d(kWheelBase.baseUnitMagnitude() / 2, kTrackWidth.negate().baseUnitMagnitude() / 2),
+        new Translation2d(kWheelBase.negate().baseUnitMagnitude() / 2, kTrackWidth.baseUnitMagnitude() / 2),
+        new Translation2d(kWheelBase.negate().baseUnitMagnitude() / 2, kTrackWidth.negate().baseUnitMagnitude() / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
@@ -232,16 +238,14 @@ public final class Constants {
     //public static final double kArmSlewRate = 2;
     public static final double kArmDeadband = 0.1;
 
-    public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
-    public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5); //Amp shooting agngle
-    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5); //Connect to chain
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5 Normal Pickup & Auto Shoot
-    //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-40); //-40 Jiggle & Trap 
-    public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
-    public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
-    public static final double kArmFeederAngle = Units.degreesToRadians(-20); //20
-
+    public static final Measure<Angle> kArmTestOffsetRads = Degrees.of(15);
+    public static final Measure<Angle> kArmShootingAngleRads = Degrees.of(57.5); // Amp shooting angle
+    public static final Measure<Angle> kArmFarShootingAngleRads = Degrees.of(47.5); // Connect to chain
+    public static final Measure<Angle> kArmPickupAngleRads = Degrees.of(-37.5); //37.5 Normal Pickup & Auto Shoot
+    public static final Measure<Angle> kArmDownRads = Degrees.of(-40); //-40 Jiggle & Trap 
+    public static final Measure<Angle> kArmShootingStepsRads = kArmShootingAngleRads.minus(kArmFarShootingAngleRads).divide(3);
+    public static final Measure<Angle> kArmPickupStepsRads = Degrees.of(1);
+    public static final Measure<Angle> kArmFeederAngle = Degrees.of(-20);
   }
     
   public static final class HendersonConstants {
