@@ -235,9 +235,9 @@ public final class Constants {
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
     public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5); //Amp shooting agngle
     public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5); //Connect to chain
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5 Normal Pickup & Auto Shoot
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-39); //37.5 Normal Pickup & Auto Shoot
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-40); //-40 Jiggle & Trap 
+    public static final double kArmDownRads = Units.degreesToRadians(-41); //-40 Jiggle & Trap 
     public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
     public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
     public static final double kArmFeederAngle = Units.degreesToRadians(-20); //20

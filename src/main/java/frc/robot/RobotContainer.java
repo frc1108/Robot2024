@@ -160,10 +160,10 @@ public class RobotContainer implements Logged{
                                          ()->m_launcher.set(HendersonConstants.kLauncherBackSpeed),
                                          ()->m_launcher.set(0),m_launcher));
     
-    m_operatorController.axisGreaterThan(0,0.75).onTrue(shoot());
-    m_operatorController.axisLessThan(0,-0.75).onTrue(shootBackwards());
-    m_operatorController.axisGreaterThan(1,0.75).onTrue(intakeNote());
-    m_operatorController.axisLessThan(1,-0.75).onTrue(centeringNote());
+    // m_operatorController.axisGreaterThan(0,0.75).onTrue(shoot());
+    // m_operatorController.axisLessThan(0,-0.75).onTrue(shootBackwards());
+    // m_operatorController.axisGreaterThan(1,0.75).onTrue(intakeNote());
+    // m_operatorController.axisLessThan(1,-0.75).onTrue(centeringNote());
 
     m_operatorController.start().onTrue(Commands.runOnce(()->m_arm.enableClimb()));
     m_operatorController.back().onTrue(Commands.runOnce(()->m_arm.disableClimb()));
