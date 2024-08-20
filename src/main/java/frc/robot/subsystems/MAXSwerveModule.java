@@ -17,7 +17,6 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;

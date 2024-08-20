@@ -5,8 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -36,9 +34,7 @@ import java.io.IOException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.revrobotics.CANSparkBase.IdleMode;
 
 import monologue.Monologue;
 import monologue.Annotations.Log;
@@ -124,7 +120,6 @@ public class RobotContainer implements Logged{
     //**** TRIGGERS ****/
     //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
-    //TODO RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
     new Trigger(()->!m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.off()));
     new Trigger(()->m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.orange()));
 
