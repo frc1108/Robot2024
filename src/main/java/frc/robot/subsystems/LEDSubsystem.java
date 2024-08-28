@@ -9,18 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LedConstants;
 import frc.utils.led.TrobotAddressableLED;
@@ -28,7 +23,6 @@ import frc.utils.led.TrobotAddressableLEDPattern;
 import frc.utils.led.patterns.matrix.ColorSoundMeter;
 import frc.utils.led.patterns.matrix.MultiColorMeter;
 import frc.utils.led.patterns.strip.BlinkingPattern;
-import frc.utils.led.patterns.strip.ChaosPattern;
 import frc.utils.led.patterns.strip.RainbowPattern;
 import frc.utils.led.patterns.strip.SolidColorPattern;
 

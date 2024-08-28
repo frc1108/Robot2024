@@ -4,15 +4,16 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -31,7 +32,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 5.5;
+    public static final double kMaxSpeedMetersPerSecond = 5.76; //5.5
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.5; // radians per second 1.2
@@ -67,21 +68,25 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 16;
 
     // Drive Module constants
+    public static final double kFrontLeftDrivingkP = 0.005; //0.125
     public static final double kFrontLeftDrivingkS = 0.05; //0.125
-    public static final double kFrontLeftDrivingkV = 2.21; //2.21
-    public static final double kFrontLeftDrivingkA = 0.37; //0.37
+    public static final double kFrontLeftDrivingkV = 2.5; //2.21
+    public static final double kFrontLeftDrivingkA = 0.24; //0.37 //0.095
 
+    public static final double kFrontRightDrivingkP = 0.005; //0.125
     public static final double kFrontRightDrivingkS = 0.05; //0.125
-    public static final double kFrontRightDrivingkV = 2.21; //2.21
-    public static final double kFrontRightDrivingkA = 0.37; //0.37
+    public static final double kFrontRightDrivingkV = 2.18; //2.21
+    public static final double kFrontRightDrivingkA = 0.25; //0.37
 
+    public static final double kRearLeftDrivingkP = 0.005;
     public static final double kRearLeftDrivingkS = 0.05;
     public static final double kRearLeftDrivingkV = 2.21;
-    public static final double kRearLeftDrivingkA = 0.37;
+    public static final double kRearLeftDrivingkA = 0.27;
 
+    public static final double kRearRightDrivingkP = 0.005;
     public static final double kRearRightDrivingkS = 0.05;
-    public static final double kRearRightDrivingkV = 2.21;
-    public static final double kRearRightDrivingkA = 0.37;
+    public static final double kRearRightDrivingkV = 2.5;
+    public static final double kRearRightDrivingkA = 0.28;
   }
 
   public static final class ModuleConstants {
@@ -96,7 +101,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = VortexMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.0762; // 0.072; // 0.0762 (Caliper and squeeze 3/28 3D printed -- Max 0.0753)
+    public static final double kWheelDiameterMeters = 0.072; //72; // 0.072; // 0.0762 (Caliper and squeeze 3/28 3D printed -- Max 0.0753)
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -114,23 +119,11 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    // Recalc values for arbfeedForward
-    public static final double kDrivingkS = 0.125; //0.08 //0.175
-    public static final double kDrivingkV = 2.21; //Must be greater than zero 2.21
-    public static final double kDrivingkA = 0.37; //Must be greater than zero 0.37
-
-    // public static final double kDrivingP = 0.04; //0.04
-    // public static final double kDrivingI = 0;
-    // public static final double kDrivingD = 0;
-    // public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
-    // public static final double kDrivingMinOutput = -1;
-    // public static final double kDrivingMaxOutput = 1;
-
     // TEST Values turnoff PID
-    public static final double kDrivingP = 0.04; 
+    // public static final double kDrivingP = 0.04; 
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
-    public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
+    public static final double kDrivingFF = 0; //1.1 / kDriveWheelFreeSpeedRps;
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
@@ -155,21 +148,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-
-    public static final double kPXController = 2;
-    public static final double kPYController = 2;
-    public static final double kPThetaController = 1;
-    // public static final double kPXController = 5;
-    // public static final double kPYController = 5;
-    // public static final double kPThetaController = 5;
-
-    // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final PIDConstants kTranslationPid = new PIDConstants(5,0,0);
+    public static final PIDConstants kRotationPid = new PIDConstants(5,0,0);
   }
 
   public static final class VortexMotorConstants {
@@ -252,13 +232,14 @@ public final class Constants {
     public static final double kArmDeadband = 0.1;
 
     public static final double kArmTestOffsetRads = Units.degreesToRadians(15);
-    public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5);
-    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5);
-    public static final double kArmPickupAngleRads = Units.degreesToRadians(-37.5); //37.5
+    public static final double kArmShootingAngleRads = Units.degreesToRadians(57.5); //Amp shooting agngle
+    public static final double kArmFarShootingAngleRads = Units.degreesToRadians(47.5); //Connect to chain
+    public static final double kArmPickupAngleRads = Units.degreesToRadians(-39); //37.5 Normal Pickup & Auto Shoot
     //public static final double kArmStraightUpAngleRads = Units.degreesToRadians(90 );
-    public static final double kArmDownRads = Units.degreesToRadians(-40); //20 -39
+    public static final double kArmDownRads = Units.degreesToRadians(-41); //-40 Jiggle & Trap 
     public static final double kArmShootingStepsRads = (kArmShootingAngleRads - kArmFarShootingAngleRads) / 3; //20
     public static final double kArmPickupStepsRads = Units.degreesToRadians(1); //20
+    public static final double kArmFeederAngle = Units.degreesToRadians(-20); //20
 
   }
     
@@ -299,14 +280,19 @@ public final class Constants {
         public static final String kCameraName = "Tag Camera OV9281";
         public static final Transform3d kCameraOffset = new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(1.0),
-                Units.inchesToMeters(-11.5),
-                Units.inchesToMeters(8.50)),
+                Units.inchesToMeters(-5), // 1.0 in
+                Units.inchesToMeters(-12), // -12 in
+                Units.inchesToMeters(8.50)), //8.5 in
             new Rotation3d(
                 0.0,
-                Rotation2d.fromDegrees(25.0).getRadians(),
-                Rotation2d.fromDegrees(170).getRadians()
+                Rotation2d.fromDegrees(20.0).getRadians(), //22
+                Rotation2d.fromDegrees(175).getRadians()
             ));
+        public static final double kMaxDistanceMeters = 3;
+        public static final Pose2d kBlueSpeakerSubwoofer = 
+          new Pose2d(1.45,5.55,new Rotation2d(Units.degreesToRadians(0)));
+        public static final Pose2d kRedSpeakerSubwoofer = 
+          new Pose2d(15.15,5.55,new Rotation2d(Units.degreesToRadians(180)));
     }
 
   public static final class NoteVisionConstants {

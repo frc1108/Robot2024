@@ -5,8 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -36,9 +34,7 @@ import java.io.IOException;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.revrobotics.CANSparkBase.IdleMode;
 
 import monologue.Monologue;
 import monologue.Annotations.Log;
@@ -86,7 +82,7 @@ public class RobotContainer implements Logged{
     setupMonologue();
     setupPathPlannerLog();
     try {
-      m_vision = new Vision(m_robotDrive::visionPose);
+      m_vision = new Vision(m_robotDrive::visionPose, m_robotDrive);
     }
      catch(IOException e) {
      DriverStation.reportWarning("Unable to initialize vision", e.getStackTrace());
@@ -124,7 +120,6 @@ public class RobotContainer implements Logged{
     //**** TRIGGERS ****/
     //RobotModeTriggers.autonomous().onTrue(Commands.runOnce(()->m_feeder.enableLimitSwitches()));
     RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
-    RobotModeTriggers.teleop().onTrue(Commands.runOnce(()->m_robotDrive.setVisionStdDevs(0.5,0.5,999999))); //, m_invertDriveAlliance, m_invertDriveAlliance);));
     new Trigger(()->!m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.off()));
     new Trigger(()->m_feeder.getBeamBreak()).and(()->!this.intakeNote().isScheduled()).onTrue(Commands.runOnce(()->m_led.orange()));
 
@@ -160,10 +155,10 @@ public class RobotContainer implements Logged{
                                          ()->m_launcher.set(HendersonConstants.kLauncherBackSpeed),
                                          ()->m_launcher.set(0),m_launcher));
     
-    m_operatorController.axisGreaterThan(0,0.75).onTrue(shoot());
-    m_operatorController.axisLessThan(0,-0.75).onTrue(shootBackwards());
-    m_operatorController.axisGreaterThan(1,0.75).onTrue(intakeNote());
-    m_operatorController.axisLessThan(1,-0.75).onTrue(centeringNote());
+    // m_operatorController.axisGreaterThan(0,0.75).onTrue(shoot());
+    // m_operatorController.axisLessThan(0,-0.75).onTrue(shootBackwards());
+    // m_operatorController.axisGreaterThan(1,0.75).onTrue(intakeNote());
+    // m_operatorController.axisLessThan(1,-0.75).onTrue(centeringNote());
 
     m_operatorController.start().onTrue(Commands.runOnce(()->m_arm.enableClimb()));
     m_operatorController.back().onTrue(Commands.runOnce(()->m_arm.disableClimb()));
@@ -175,7 +170,7 @@ public class RobotContainer implements Logged{
     m_operatorController.povUp().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads));
     m_operatorController.povRight().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads));
     m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
-    m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
+    //m_operatorController.povLeft().onTrue(m_arm.setArmGoalCommand(ArmConstants.kArmDownRads));
 
     m_operatorController.axisGreaterThan(5,-0.75).onTrue(
       m_arm.setArmGoalCommand(ArmConstants.kArmFarShootingAngleRads+1*ArmConstants.kArmShootingStepsRads));
@@ -185,6 +180,10 @@ public class RobotContainer implements Logged{
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+1*ArmConstants.kArmPickupStepsRads));
     m_operatorController.axisGreaterThan(4,-0.75).onTrue(
       m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads+2*ArmConstants.kArmPickupStepsRads));
+    m_operatorController.axisGreaterThan(2,0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads));
+    m_operatorController.axisGreaterThan(3,0.75).onTrue(
+      m_arm.setArmGoalCommand(ArmConstants.kArmFeederAngle));
 
     m_driverController.axisGreaterThan(3, 0.75).onTrue(Commands.runOnce(()->m_feeder.disableLimitSwitches()));
       }
@@ -201,13 +200,17 @@ public class RobotContainer implements Logged{
   private void configureNamedCommands() {
       NamedCommands.registerCommand("LaunchNote", shoot());
       NamedCommands.registerCommand("IntakeNote", intakeNote());
+      NamedCommands.registerCommand("AmpShot", AmpShot());
+      NamedCommands.registerCommand("Stop", Stop());
       NamedCommands.registerCommand("ShootBackwards", shootBackwards());
       NamedCommands.registerCommand("CenteringNote", centeringNote());
+      NamedCommands.registerCommand("AllWheelsForward", m_robotDrive.setAllWheelsForward());
+      NamedCommands.registerCommand("AllWheelsRight", m_robotDrive.setAllWheelsRight());
     }
 
   public void configureWithAlliance(Alliance alliance) {
     m_led.startCrowdMeter(alliance);
-    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:-1; //TODO Fix the invert problem
+    m_invertDriveAlliance = (alliance == Alliance.Blue)?-1:1;
   }
    
   public Command intakeNote() {
@@ -248,10 +251,29 @@ public class RobotContainer implements Logged{
      );
   }
 
+  public Command AmpShot() {
+     return Commands.sequence(
+         m_arm.setArmGoalCommand(ArmConstants.kArmShootingAngleRads),
+         Commands.waitSeconds(1.75),
+         Commands.runOnce(()->m_feeder.set(1.0)),
+         Commands.waitSeconds(1.0),
+         Commands.runOnce(()->m_feeder.set(0.0)),
+         m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads)
+      );
+   }
+
+  public Command Stop() {
+     return Commands.sequence(
+         Commands.runOnce(()->m_launcher.set(0)),
+         Commands.runOnce(()->m_feeder.set(0)),
+         Commands.runOnce(()->m_underroller.setUnderrollerspeed(0),m_underroller)
+      );
+   }
+  
     public Command shootBackwards() {
     return Commands.sequence(
       Commands.runOnce(()->m_feeder.disableLimitSwitches()),
-      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads-Units.degreesToRadians(2)),
+      m_arm.setArmGoalCommand(ArmConstants.kArmPickupAngleRads),
       Commands.waitSeconds(0.3),
       Commands.runOnce(()->m_feeder.set(1)),
       Commands.waitSeconds(0.3),

@@ -17,7 +17,6 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import monologue.Logged;
 import monologue.Annotations.Log;
@@ -36,7 +35,7 @@ public class MAXSwerveModule implements Logged {
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   private SimpleMotorFeedforward m_feedforward;
-  private double m_kS, m_kA, m_kV;
+  private double m_kS, m_kA, m_kV, m_kP;
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
    * encoder, and PID controller. This configuration is specific to the REV
@@ -44,7 +43,8 @@ public class MAXSwerveModule implements Logged {
    * Encoder.
    */
   public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset,
-                         double kS, double kV, double kA) {
+                         double kP,double kS, double kV, double kA) {
+    m_kP = kP;
     m_kS = kS;
     m_kV = kV;
     m_kA = kA;
@@ -94,7 +94,7 @@ public class MAXSwerveModule implements Logged {
 
     // Set the PID gains for the driving motor. Note these are example gains, and you
     // may need to tune them for your own robot!
-    m_drivingPIDController.setP(ModuleConstants.kDrivingP);
+    m_drivingPIDController.setP(this.m_kP);
     m_drivingPIDController.setI(ModuleConstants.kDrivingI);
     m_drivingPIDController.setD(ModuleConstants.kDrivingD);
     m_drivingPIDController.setFF(ModuleConstants.kDrivingFF);
@@ -168,15 +168,15 @@ public class MAXSwerveModule implements Logged {
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
     var sign = Math.signum(optimizedDesiredState.speedMetersPerSecond);
-    // m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, 
-    //                                     CANSparkMax.ControlType.kVelocity,
-    //                                     0,
-    //                                     m_feedforward.calculate(
-    //                                       sign*m_desiredState.speedMetersPerSecond,
-    //                                       sign*desiredState.speedMetersPerSecond,
-    //                                       0.02)
-    //                                     );
-    m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+    m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, 
+                                        CANSparkMax.ControlType.kVelocity,
+                                        0,
+                                        m_feedforward.calculate(
+                                          sign*m_desiredState.speedMetersPerSecond,
+                                          sign*desiredState.speedMetersPerSecond,
+                                          0.02)
+                                        );
+    //m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
     m_turningPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
 
     m_desiredState = desiredState;

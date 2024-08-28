@@ -14,12 +14,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "One Meter Straight"
+            "pathName": "Six Meter Straight"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Tests",
   "choreoAuto": false
 }
